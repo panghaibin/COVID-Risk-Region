@@ -5,13 +5,13 @@
     <el-tree
         :data="high_tree"
         node-key="id"
-        :default-expand-all="true"
+        :default-expanded-keys="high_id_list"
     />
     <p>中风险</p>
     <el-tree
         :data="middle_tree"
         node-key="id"
-        :default-expand-all="true"
+        :default-expanded-keys="middle_id_list"
     />
   </template>
 </template>
@@ -39,11 +39,12 @@ export default {
     axios
         .get(this.data_url)
         .then(function (response) {
-          that.raw_data = response.data
-          let high = list2tree(that.raw_data.data.highlist)
+          let raw = response.data
+          that.raw = raw
+          let high = list2tree(raw.data.highlist)
           that.high_tree = high["tree"]
           that.high_id_list = high["id_list"]
-          let middle = list2tree(that.raw_data.data.middlelist)
+          let middle = list2tree(raw.data.middlelist)
           that.middle_tree = middle["tree"]
           that.middle_id_list = middle["id_list"]
 
@@ -59,6 +60,7 @@ export default {
 function list2tree(list) {
   let tree = []
   let id_count = 0
+  let id_list = []
   for (let i = 0; i < list.length; i++) {
     let item = list[i]
     let province = item.province
@@ -83,6 +85,7 @@ function list2tree(list) {
         children: []
       }
       tree.push(province_item)
+      id_list.push(province_item.id)
     }
     for (let j = 0; j < province_item.children.length; j++) {
       let province_item_child = province_item.children[j]
@@ -98,6 +101,7 @@ function list2tree(list) {
         children: []
       }
       province_item.children.push(city_item)
+      // id_list.push(city_item.id)
     }
 
     for (let j = 0; j < city_item.children.length; j++) {
@@ -114,6 +118,7 @@ function list2tree(list) {
         children: []
       }
       city_item.children.push(county_item)
+      // id_list.push(county_item.id)
     }
     for (let j = 0; j < county_item.children.length; j++) {
       let county_item_child = county_item.children[j]
@@ -133,9 +138,6 @@ function list2tree(list) {
       }
     }
   }
-  let id_list = [...Array(++id_count).keys()]
-  // console.log(id_count)
-  // console.log(id_list)
   return {
     "tree": tree,
     "id_list": id_list
