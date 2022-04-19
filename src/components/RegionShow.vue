@@ -1,37 +1,38 @@
 <template>
-  <el-container v-if="ok">
-    <el-main>
-      <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>
-      <h3 id="high-risk">
-        高风险等级地区
-        <span class="num">({{ raw.data.hcount }})</span>
-        <el-button class="expand-all" type="primary" @click="high_expand">{{ high_expand_all_button }}</el-button>
-      </h3>
-      <el-tree
-          :data="high_tree"
-          node-key="id"
-          :default-expand-all="high_expand_all"
-          :default-expanded-keys="high_default_id_list"
-          :auto-expand-parent="false"
-          ref="high_tree"
-          :filter-node-method="filter_high_node"
-      />
-      <h3 id="middle-risk">
-        中风险等级地区
-        <span class="num">({{ raw.data.mcount }})</span>
-        <el-button class="expand-all" type="primary" @click="middle_expand">{{ middle_expand_all_button }}</el-button>
-      </h3>
-      <el-tree
-          :data="middle_tree"
-          node-key="id"
-          :default-expand-all="middle_expand_all"
-          :default-expanded-keys="middle_default_id_list"
-          :auto-expand-parent="false"
-          ref="middle_tree"
-          :filter-node-method="filter_middle_node"
-      />
-    </el-main>
-  </el-container>
+  <el-main v-if="!ok">
+    Loading...
+  </el-main>
+  <el-main v-if="ok">
+    <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>
+    <h3 id="high-risk">
+      高风险等级地区
+      <span class="num">({{ raw.data.hcount }})</span>
+      <el-button class="expand-all" type="primary" @click="high_expand">{{ high_expand_all_button }}</el-button>
+    </h3>
+    <el-tree
+        :data="high_tree"
+        node-key="id"
+        :default-expand-all="high_expand_all"
+        :default-expanded-keys="high_default_id_list"
+        :auto-expand-parent="false"
+        ref="high_tree"
+        :filter-node-method="filter_high_node"
+    />
+    <h3 id="middle-risk">
+      中风险等级地区
+      <span class="num">({{ raw.data.mcount }})</span>
+      <el-button class="expand-all" type="primary" @click="middle_expand">{{ middle_expand_all_button }}</el-button>
+    </h3>
+    <el-tree
+        :data="middle_tree"
+        node-key="id"
+        :default-expand-all="middle_expand_all"
+        :default-expanded-keys="middle_default_id_list"
+        :auto-expand-parent="false"
+        ref="middle_tree"
+        :filter-node-method="filter_middle_node"
+    />
+  </el-main>
 </template>
 
 <script>
@@ -66,6 +67,7 @@ export default {
     }
   },
   mounted() {
+    let loading = this.$loading()
     let that = this
     axios
         .get(this.data_url)
@@ -86,6 +88,7 @@ export default {
           that.middle_county_id_list = middle["county_id_list"]
           that.middle_default_id_list = that.middle_province_id_list.concat(that.middle_county_id_list)
 
+          loading.close()
           that.ok = true
           // console.log(that.middle_tree)
         })

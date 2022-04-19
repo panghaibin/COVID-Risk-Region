@@ -1,5 +1,7 @@
 <template>
-  <RegionShow :data_url="data_url"></RegionShow>
+  <el-container>
+    <RegionShow :data_url="data_url"></RegionShow>
+  </el-container>
 </template>
 
 <script>
