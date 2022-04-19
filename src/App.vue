@@ -1,15 +1,15 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <RegionShow data_url="http://localhost/latest.json"></RegionShow>
+<!--  <RegionShow data_url="https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json"></RegionShow>-->
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import RegionShow from "@/components/RegionShow";
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    RegionShow
   }
 }
 </script>
