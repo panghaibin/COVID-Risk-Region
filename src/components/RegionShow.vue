@@ -1,17 +1,29 @@
 <template>
   <template v-if="ok">
-    <el-input v-model="filterText" placeholder="请输入区域名称"></el-input>
-    <p>高风险</p>
+<!--    <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>-->
+    <p id="high_risk">
+      高风险
+      <span class="num">({{ raw.data.hcount}})</span>
+      <el-button type="text" @click="high_expand">展开全部</el-button>
+    </p>
     <el-tree
         :data="high_tree"
         node-key="id"
-        :default-expanded-keys="high_id_list"
+        :default-expand-all="high_expand_all"
+        :default-expanded-keys="high_default_id_list"
+        ref="high_tree"
     />
-    <p>中风险</p>
+    <p id="middle_risk">
+      中风险
+      <span class="num">({{ raw.data.mcount }})</span>
+      <el-button type="text" @click="middle_expand">展开全部</el-button>
+    </p>
     <el-tree
         :data="middle_tree"
         node-key="id"
-        :default-expanded-keys="middle_id_list"
+        :default-expand-all="middle_expand_all"
+        :default-expanded-keys="middle_default_id_list"
+        ref="middle_tree"
     />
   </template>
 </template>
@@ -26,12 +38,17 @@ export default {
   },
   data() {
     return {
-      raw_data: null,
+      raw: null,
       ok: false,
       high_tree: null,
-      high_id_list: null,
+      high_all_id_list: null,
+      high_default_id_list: null,
+      high_expand_all: false,
       middle_tree: null,
-      middle_id_list: null
+      middle_all_id_list: null,
+      middle_default_id_list: null,
+      middle_expand_all: false,
+      filter_text: ""
     }
   },
   mounted() {
@@ -43,10 +60,12 @@ export default {
           that.raw = raw
           let high = list2tree(raw.data.highlist)
           that.high_tree = high["tree"]
-          that.high_id_list = high["id_list"]
+          that.high_default_id_list = high["default_id_list"]
+          that.high_all_id_list = high["all_id_list"]
           let middle = list2tree(raw.data.middlelist)
           that.middle_tree = middle["tree"]
-          that.middle_id_list = middle["id_list"]
+          that.middle_default_id_list = middle["default_id_list"]
+          that.middle_all_id_list = middle["all_id_list"]
 
           that.ok = true
           // console.log(that.middle_tree)
@@ -55,12 +74,35 @@ export default {
           console.log(error)
         })
   },
+  methods: {
+    high_expand(){
+      this.high_expand_all = !this.high_expand_all
+      for (let i = 0;i < this.$refs.high_tree.store._getAllNodes().length;i++) {
+        this.$refs.high_tree.store._getAllNodes()[i].expanded = this.high_expand_all;
+      }
+    },
+    middle_expand(){
+      this.middle_expand_all = !this.middle_expand_all
+      for (let i = 0;i < this.$refs.middle_tree.store._getAllNodes().length;i++) {
+        this.$refs.middle_tree.store._getAllNodes()[i].expanded = this.middle_expand_all;
+      }
+    },
+    filter_high_node(value, data) {
+      if (!value) return true
+      return data.label.includes(value)
+    },
+    filter_middle_node(value, data) {
+      if (!value) return true
+      return data.label.includes(value)
+    }
+  }
 }
 
 function list2tree(list) {
   let tree = []
   let id_count = 0
-  let id_list = []
+  let default_id_list = []
+  let all_id_list = []
   for (let i = 0; i < list.length; i++) {
     let item = list[i]
     let province = item.province
@@ -82,10 +124,12 @@ function list2tree(list) {
       province_item = {
         id: id_count++,
         label: province,
-        children: []
+        children: [],
+        expanded: true
       }
       tree.push(province_item)
-      id_list.push(province_item.id)
+      default_id_list.push(province_item.id)
+      all_id_list.push(province_item.id)
     }
     for (let j = 0; j < province_item.children.length; j++) {
       let province_item_child = province_item.children[j]
@@ -98,10 +142,12 @@ function list2tree(list) {
       city_item = {
         id: id_count++,
         label: city,
-        children: []
+        children: [],
+        expanded: true
       }
       province_item.children.push(city_item)
       // id_list.push(city_item.id)
+      all_id_list.push(city_item.id)
     }
 
     for (let j = 0; j < city_item.children.length; j++) {
@@ -115,10 +161,12 @@ function list2tree(list) {
       county_item = {
         id: id_count++,
         label: county,
-        children: []
+        children: [],
+        expanded: true
       }
       city_item.children.push(county_item)
       // id_list.push(county_item.id)
+      all_id_list.push(county_item.id)
     }
     for (let j = 0; j < county_item.children.length; j++) {
       let county_item_child = county_item.children[j]
@@ -140,7 +188,8 @@ function list2tree(list) {
   }
   return {
     "tree": tree,
-    "id_list": id_list
+    "default_id_list": default_id_list,
+    "all_id_list": all_id_list
   }
 
 }
@@ -148,5 +197,17 @@ function list2tree(list) {
 </script>
 
 <style scoped>
+#high_risk, #middle_risk {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  font-weight: bold;
+}
+#high_risk .num {
+  color: #c45656;
+}
+#middle_risk .num {
+  color: #ffa500;
+}
 
 </style>
