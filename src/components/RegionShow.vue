@@ -3,7 +3,7 @@
     <el-main>
       <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>
       <h3 id="high-risk">
-        高风险地区
+        高风险等级地区
         <span class="num">({{ raw.data.hcount }})</span>
         <el-button class="expand-all" type="primary" @click="high_expand">{{ high_expand_all_button }}</el-button>
       </h3>
@@ -17,7 +17,7 @@
           :filter-node-method="filter_high_node"
       />
       <h3 id="middle-risk">
-        中风险地区
+        中风险等级地区
         <span class="num">({{ raw.data.mcount }})</span>
         <el-button class="expand-all" type="primary" @click="middle_expand">{{ middle_expand_all_button }}</el-button>
       </h3>
@@ -271,11 +271,11 @@ function list2tree(list) {
 }
 
 #high-risk .num {
-  color: #c45656;
+  color: #f26161;
 }
 
 #middle-risk .num {
-  color: #ffa500;
+  color: #fdbe34;
 }
 
 .expand-all {
