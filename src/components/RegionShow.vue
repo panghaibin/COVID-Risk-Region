@@ -14,7 +14,7 @@
           :default-expanded-keys="high_default_id_list"
           :auto-expand-parent="false"
           ref="high_tree"
-          :filter-node-method="filter_node"
+          :filter-node-method="filter_high_node"
       />
       <h3 id="middle-risk">
         中风险地区
@@ -28,7 +28,7 @@
           :default-expanded-keys="middle_default_id_list"
           :auto-expand-parent="false"
           ref="middle_tree"
-          :filter-node-method="filter_node"
+          :filter-node-method="filter_middle_node"
       />
     </el-main>
   </el-container>
@@ -122,10 +122,36 @@ export default {
       }
       this.middle_expand_all_button = this.middle_expand_all ? "收起" : "展开"
     },
-    filter_node(value, data) {
+    filter_high_node(value, data) {
       if (!value) return true
-      return data.label.includes(value)
-    }
+      if (data.label.includes(value)) {
+        return true
+      }
+      let parent_id = data.pid
+      while (parent_id !== -1) {
+        let parent_node = this.$refs.high_tree.store.getNode(parent_id).data
+        if (parent_node.label.includes(value)) {
+          return true
+        }
+        parent_id = parent_node.pid
+      }
+      return false
+    },
+    filter_middle_node(value, data) {
+      if (!value) return true
+      if (data.label.includes(value)) {
+        return true
+      }
+      let parent_id = data.pid
+      while (parent_id !== -1) {
+        let parent_node = this.$refs.middle_tree.store.getNode(parent_id).data
+        if (parent_node.label.includes(value)) {
+          return true
+        }
+        parent_id = parent_node.pid
+      }
+      return false
+    },
   },
   watch: {
     filter_text(value) {
@@ -161,6 +187,7 @@ function list2tree(list) {
     if (province_item === null) {
       province_item = {
         id: id_count++,
+        pid: -1,
         label: province,
         children: [],
         expanded: true
@@ -178,6 +205,7 @@ function list2tree(list) {
     if (city_item === null) {
       city_item = {
         id: id_count++,
+        pid: province_item.id,
         label: city,
         children: [],
         expanded: true
@@ -196,6 +224,7 @@ function list2tree(list) {
     if (county_item === null) {
       county_item = {
         id: id_count++,
+        pid: city_item.id,
         label: county,
         children: [],
         expanded: true
@@ -216,6 +245,7 @@ function list2tree(list) {
       for (let j = 0; j < communitys.length; j++) {
         county_item.children.push({
           id: id_count++,
+          pid: county_item.id,
           label: communitys[j]
         })
       }
