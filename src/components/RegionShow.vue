@@ -1,31 +1,33 @@
 <template>
-  <template v-if="ok">
-<!--    <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>-->
-    <p id="high_risk">
-      高风险
-      <span class="num">({{ raw.data.hcount}})</span>
-      <el-button type="text" @click="high_expand">展开全部</el-button>
-    </p>
-    <el-tree
-        :data="high_tree"
-        node-key="id"
-        :default-expand-all="high_expand_all"
-        :default-expanded-keys="high_default_id_list"
-        ref="high_tree"
-    />
-    <p id="middle_risk">
-      中风险
-      <span class="num">({{ raw.data.mcount }})</span>
-      <el-button type="text" @click="middle_expand">展开全部</el-button>
-    </p>
-    <el-tree
-        :data="middle_tree"
-        node-key="id"
-        :default-expand-all="middle_expand_all"
-        :default-expanded-keys="middle_default_id_list"
-        ref="middle_tree"
-    />
-  </template>
+  <el-container v-if="ok">
+    <el-main>
+      <!--    <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>-->
+      <h3 id="high-risk">
+        高风险地区
+        <span class="num">({{ raw.data.hcount }})</span>
+        <el-button class="expanded-all" type="primary" @click="high_expand">{{ high_expand_all_button }}</el-button>
+      </h3>
+      <el-tree
+          :data="high_tree"
+          node-key="id"
+          :default-expand-all="high_expand_all"
+          :default-expanded-keys="high_default_id_list"
+          ref="high_tree"
+      />
+      <h3 id="middle-risk">
+        中风险地区
+        <span class="num">({{ raw.data.mcount }})</span>
+        <el-button class="expanded-all" type="primary" @click="middle_expand">{{ middle_expand_all_button }}</el-button>
+      </h3>
+      <el-tree
+          :data="middle_tree"
+          node-key="id"
+          :default-expand-all="middle_expand_all"
+          :default-expanded-keys="middle_default_id_list"
+          ref="middle_tree"
+      />
+    </el-main>
+  </el-container>
 </template>
 
 <script>
@@ -44,10 +46,14 @@ export default {
       high_all_id_list: null,
       high_default_id_list: null,
       high_expand_all: false,
+      high_expand_all_button: "展开",
+
       middle_tree: null,
       middle_all_id_list: null,
       middle_default_id_list: null,
       middle_expand_all: false,
+      middle_expand_all_button: "展开",
+
       filter_text: ""
     }
   },
@@ -75,17 +81,31 @@ export default {
         })
   },
   methods: {
-    high_expand(){
+    high_expand() {
       this.high_expand_all = !this.high_expand_all
-      for (let i = 0;i < this.$refs.high_tree.store._getAllNodes().length;i++) {
-        this.$refs.high_tree.store._getAllNodes()[i].expanded = this.high_expand_all;
+      if (this.high_expand_all) {
+        for (let i = 0; i < this.$refs.high_tree.store._getAllNodes().length; i++) {
+          this.$refs.high_tree.store._getAllNodes()[i].expanded = true;
+        }
+      } else {
+        for (let i = 0; i < this.high_all_id_list.length; i++) {
+          this.$refs.high_tree.store.getNode(this.high_all_id_list[i]).expanded = false;
+        }
       }
+      this.high_expand_all_button = this.high_expand_all ? "收起" : "展开"
     },
-    middle_expand(){
+    middle_expand() {
       this.middle_expand_all = !this.middle_expand_all
-      for (let i = 0;i < this.$refs.middle_tree.store._getAllNodes().length;i++) {
-        this.$refs.middle_tree.store._getAllNodes()[i].expanded = this.middle_expand_all;
+      if (this.middle_expand_all) {
+        for (let i = 0; i < this.$refs.middle_tree.store._getAllNodes().length; i++) {
+          this.$refs.middle_tree.store._getAllNodes()[i].expanded = true;
+        }
+      } else {
+        for (let i = 0; i < this.middle_all_id_list.length; i++) {
+          this.$refs.middle_tree.store.getNode(this.middle_all_id_list[i]).expanded = false;
+        }
       }
+      this.middle_expand_all_button = this.middle_expand_all ? "收起" : "展开"
     },
     filter_high_node(value, data) {
       if (!value) return true
@@ -129,7 +149,7 @@ function list2tree(list) {
       }
       tree.push(province_item)
       default_id_list.push(province_item.id)
-      all_id_list.push(province_item.id)
+      // all_id_list.push(province_item.id)
     }
     for (let j = 0; j < province_item.children.length; j++) {
       let province_item_child = province_item.children[j]
@@ -166,7 +186,7 @@ function list2tree(list) {
       }
       city_item.children.push(county_item)
       // id_list.push(county_item.id)
-      all_id_list.push(county_item.id)
+      // all_id_list.push(county_item.id)
     }
     for (let j = 0; j < county_item.children.length; j++) {
       let county_item_child = county_item.children[j]
@@ -197,17 +217,27 @@ function list2tree(list) {
 </script>
 
 <style scoped>
-#high_risk, #middle_risk {
-  width: 100%;
-  height: 100%;
+#high-risk, #middle-risk {
+  margin-top: 1.1em;
+  margin-bottom: 0.2em;
   overflow-y: auto;
   font-weight: bold;
 }
-#high_risk .num {
+
+#high-risk .num {
   color: #c45656;
 }
-#middle_risk .num {
+
+#middle-risk .num {
   color: #ffa500;
+}
+
+.expanded-all {
+  margin-left: 20px;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 2em;
+  max-height: 100%;
 }
 
 </style>
