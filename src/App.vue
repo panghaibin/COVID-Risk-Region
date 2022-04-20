@@ -1,4 +1,7 @@
 <template>
+  <Head>
+    <title>{{ title }}</title>
+  </Head>
   <el-container>
     <RegionShow :data_url="data_url"></RegionShow>
   </el-container>
@@ -6,31 +9,19 @@
 
 <script>
 import RegionShow from "@/components/RegionShow";
-import {useHead} from "@vueuse/head";
-import {computed, reactive} from "vue";
+import {Head} from '@vueuse/head'
 
 export default {
   name: 'App',
   components: {
-    RegionShow
-  },
-  setup() {
-    const site_data = reactive({
-      title: "全国中高风险地区查询",
-    })
-    useHead({
-      title: computed(() => site_data.title),
-      meta: [
-        {
-          name: "description"
-        }
-      ]
-    });
+    RegionShow,
+    Head
   },
   data() {
     return {
-      data_url: "http://localhost/latest.json",
-      // data_url: "https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json",
+      title: "全国中高风险地区查询",
+      // data_url: "http://localhost/latest.json",
+      data_url: "https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json"
     };
   }
 }
