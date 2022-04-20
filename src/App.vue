@@ -6,11 +6,26 @@
 
 <script>
 import RegionShow from "@/components/RegionShow";
+import {useHead} from "@vueuse/head";
+import {computed, reactive} from "vue";
 
 export default {
   name: 'App',
   components: {
     RegionShow
+  },
+  setup() {
+    const site_data = reactive({
+      title: "全国中高风险地区查询",
+    })
+    useHead({
+      title: computed(() => site_data.title),
+      meta: [
+        {
+          name: "description"
+        }
+      ]
+    });
   },
   data() {
     return {

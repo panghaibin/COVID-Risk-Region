@@ -1,6 +1,6 @@
 <template>
   <el-main v-if="!ok">
-    Loading...
+<!--    Loading...-->
   </el-main>
   <el-main v-if="ok">
     <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>
@@ -47,6 +47,8 @@ export default {
     return {
       raw: null,
       ok: false,
+      err: false,
+
       high_tree: null,
       high_city_id_list: null,
       high_province_id_list: null,
@@ -88,13 +90,18 @@ export default {
           that.middle_county_id_list = middle["county_id_list"]
           that.middle_default_id_list = that.middle_province_id_list.concat(that.middle_county_id_list)
 
-          loading.close()
           that.ok = true
           // console.log(that.middle_tree)
         })
         .catch(function (error) {
           console.log(error)
+          that.err = true
         })
+    setInterval(() => {
+      if (this.ok || this.err) {
+        loading.close()
+      }
+    }, 500)
   },
   methods: {
     high_expand() {
