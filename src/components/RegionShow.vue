@@ -6,7 +6,7 @@
     <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>
     <h3 id="high-risk">
       高风险等级地区
-      <span class="num">({{ raw.data.hcount }})</span>
+      <span class="num">({{ high_count }})</span>
       <el-button class="expand-all" type="primary" @click="high_expand">{{ high_expand_all_button }}</el-button>
     </h3>
     <el-tree
@@ -20,7 +20,7 @@
     />
     <h3 id="middle-risk">
       中风险等级地区
-      <span class="num">({{ raw.data.mcount }})</span>
+      <span class="num">({{ middle_count }})</span>
       <el-button class="expand-all" type="primary" @click="middle_expand">{{ middle_expand_all_button }}</el-button>
     </h3>
     <el-tree
@@ -54,6 +54,7 @@ export default {
       high_province_id_list: null,
       high_county_id_list: null,
       high_default_id_list: null,
+      high_count: 0,
       high_expand_all: false,
       high_expand_all_button: "展开",
 
@@ -62,6 +63,7 @@ export default {
       middle_province_id_list: null,
       middle_county_id_list: null,
       middle_default_id_list: null,
+      middle_count: 0,
       middle_expand_all: false,
       middle_expand_all_button: "展开",
 
@@ -69,6 +71,7 @@ export default {
     }
   },
   mounted() {
+    // window.vue = this;
     let loading = this.$loading()
     let that = this
     axios
@@ -82,6 +85,7 @@ export default {
           that.high_city_id_list = high["city_id_list"]
           that.high_county_id_list = high["county_id_list"]
           that.high_default_id_list = that.high_province_id_list.concat(that.high_county_id_list)
+          that.high_count = raw.data.hcount
 
           let middle = list2tree(raw.data.middlelist)
           that.middle_tree = middle["tree"]
@@ -89,6 +93,7 @@ export default {
           that.middle_city_id_list = middle["city_id_list"]
           that.middle_county_id_list = middle["county_id_list"]
           that.middle_default_id_list = that.middle_province_id_list.concat(that.middle_county_id_list)
+          that.middle_count = raw.data.mcount
 
           that.ok = true
           // console.log(that.middle_tree)
@@ -133,14 +138,25 @@ export default {
       this.middle_expand_all_button = this.middle_expand_all ? "收起" : "展开"
     },
     filter_high_node(value, data) {
-      if (!value) return true
+      if (!value) {
+        if (data.children === undefined) {
+          this.high_count++
+        }
+        return true
+      }
       if (data.label.includes(value)) {
+        if (data.children === undefined) {
+          this.high_count++
+        }
         return true
       }
       let parent_id = data.pid
       while (parent_id !== -1) {
         let parent_node = this.$refs.high_tree.store.getNode(parent_id).data
         if (parent_node.label.includes(value)) {
+          if (data.children === undefined) {
+            this.high_count++
+          }
           return true
         }
         parent_id = parent_node.pid
@@ -148,14 +164,25 @@ export default {
       return false
     },
     filter_middle_node(value, data) {
-      if (!value) return true
+      if (!value) {
+        if (data.children === undefined) {
+          this.middle_count++
+        }
+        return true
+      }
       if (data.label.includes(value)) {
+        if (data.children === undefined) {
+          this.middle_count++
+        }
         return true
       }
       let parent_id = data.pid
       while (parent_id !== -1) {
         let parent_node = this.$refs.middle_tree.store.getNode(parent_id).data
         if (parent_node.label.includes(value)) {
+          if (data.children === undefined) {
+            this.middle_count++
+          }
           return true
         }
         parent_id = parent_node.pid
@@ -165,7 +192,9 @@ export default {
   },
   watch: {
     filter_text(value) {
+      this.high_count = 0
       this.$refs.high_tree.filter(value)
+      this.middle_count = 0
       this.$refs.middle_tree.filter(value)
     }
   }
