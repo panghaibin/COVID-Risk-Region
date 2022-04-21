@@ -1,16 +1,17 @@
 <template>
-  <template v-if="!ok">
-<!--    Loading...-->
-  </template>
-  <template v-if="ok">
-    <p>以下信息截止自{{ raw.data.end_update_time }}</p>
-    <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>
-    <h3 id="high-risk">
+  <div v-if="!err">
+    <p v-if="ok">以下信息截止自{{ raw.data.end_update_time }}</p>
+    <p v-else>加载中……</p>
+    <el-input v-model="filter_text" placeholder="请输入区域名称" :disabled="!ok"></el-input>
+    <h3 class="high-risk">
       高风险等级地区
       <span class="num">({{ high_count }})</span>
-      <el-button class="expand-all" type="primary" @click="high_expand">{{ high_expand_all_button }}</el-button>
+      <el-button class="expand-all" type="primary" @click="high_expand" :disabled="!ok">
+        {{ high_expand_all_button }}
+      </el-button>
     </h3>
     <el-tree
+        v-if="ok"
         :data="high_tree"
         node-key="id"
         :default-expand-all="high_expand_all"
@@ -19,12 +20,16 @@
         ref="high_tree"
         :filter-node-method="filter_high_node"
     />
-    <h3 id="middle-risk">
+    <el-skeleton v-else :rows="6" animated />
+    <h3 class="middle-risk">
       中风险等级地区
       <span class="num">({{ middle_count }})</span>
-      <el-button class="expand-all" type="primary" @click="middle_expand">{{ middle_expand_all_button }}</el-button>
+      <el-button class="expand-all" type="primary" @click="middle_expand" :disabled="!ok">
+        {{ middle_expand_all_button }}
+      </el-button>
     </h3>
     <el-tree
+        v-if="ok"
         :data="middle_tree"
         node-key="id"
         :default-expand-all="middle_expand_all"
@@ -33,7 +38,8 @@
         ref="middle_tree"
         :filter-node-method="filter_middle_node"
     />
-  </template>
+    <el-skeleton v-else :rows="6" animated />
+  </div>
 </template>
 
 <script>
@@ -73,7 +79,6 @@ export default {
   },
   mounted() {
     // window.vue = this;
-    let loading = this.$loading()
     let that = this
     axios
         .get(this.data_url)
@@ -103,11 +108,6 @@ export default {
           console.log(error)
           that.err = true
         })
-    setInterval(() => {
-      if (this.ok || this.err) {
-        loading.close()
-      }
-    }, 500)
   },
   methods: {
     high_expand() {
@@ -303,18 +303,18 @@ function list2tree(list) {
 </script>
 
 <style scoped>
-#high-risk, #middle-risk {
+.high-risk, .middle-risk {
   margin-top: 1.1em;
   margin-bottom: 0.2em;
   overflow-y: auto;
   font-weight: bold;
 }
 
-#high-risk .num {
+.high-risk .num {
   color: #f26161;
 }
 
-#middle-risk .num {
+.middle-risk .num {
   color: #fdbe34;
 }
 
