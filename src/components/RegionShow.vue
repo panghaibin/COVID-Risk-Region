@@ -40,6 +40,10 @@
     />
     <el-skeleton v-else :rows="6" animated />
   </div>
+  <div v-else>
+    <p>API 获取出错，刷新重试</p>
+    <p>{{ err_msg }}</p>
+  </div>
 </template>
 
 <script>
@@ -55,6 +59,7 @@ export default {
       raw: null,
       ok: false,
       err: false,
+      err_msg: "",
 
       high_tree: null,
       high_city_id_list: null,
@@ -106,6 +111,7 @@ export default {
         })
         .catch(function (error) {
           console.log(error)
+          that.err_msg = error
           that.err = true
         })
   },
