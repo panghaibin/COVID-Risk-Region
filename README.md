@@ -1,4 +1,4 @@
-# element-ui
+# COVID-Risk-Region
 
 ## Project setup
 ```
