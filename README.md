@@ -1,24 +1,9 @@
 # COVID-Risk-Region
 
-## Project setup
-```
-yarn install
-```
+The risk level regions on COVID-19 in China. 
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+新冠疫情中高风险地区查询
 
-### Compiles and minifies for production
-```
-yarn build
-```
+访问 [COVID-Risk-Region](https://panghb.eu.org/COVID-Risk-Region/) 在线查看。
 
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+此项目使用 Vue 3 构建，所调用的API基于 [panghaibin/RiskLevelAPI](https://github.com/panghaibin/RiskLevelAPI) 实现， [API接口](https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json) 
