@@ -1,8 +1,9 @@
 <template>
-  <el-main v-if="!ok">
+  <template v-if="!ok">
 <!--    Loading...-->
-  </el-main>
-  <el-main v-if="ok">
+  </template>
+  <template v-if="ok">
+    <p>以下信息截止自{{ raw.data.end_update_time }}</p>
     <el-input v-model="filter_text" placeholder="请输入区域名称"></el-input>
     <h3 id="high-risk">
       高风险等级地区
@@ -32,7 +33,7 @@
         ref="middle_tree"
         :filter-node-method="filter_middle_node"
     />
-  </el-main>
+  </template>
 </template>
 
 <script>

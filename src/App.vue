@@ -2,9 +2,16 @@
   <Head>
     <title>{{ title }}</title>
   </Head>
-  <el-container>
-    <RegionShow :data_url="data_url"></RegionShow>
-  </el-container>
+  <div class="content">
+    <el-container>
+      <el-header class="header">
+        <h1>全国中高风险地区查询</h1>
+      </el-header>
+      <el-main>
+        <RegionShow :data_url="data_url"></RegionShow>
+      </el-main>
+    </el-container>
+  </div>
 </template>
 
 <script>
@@ -28,5 +35,16 @@ export default {
 </script>
 
 <style>
-
+.header {
+  background-color: #f4f4f5;
+  height: auto !important;
+  text-align: center;
+  border-radius: 5px;
+}
+.content {
+  max-width: 900px;
+  min-width: 350px;
+  margin: 0 auto;
+  text-align-all: center;
+}
 </style>
