@@ -5,10 +5,10 @@
   <div class="content">
     <el-container>
       <el-header class="header">
-        <h1>全国中高风险地区查询</h1>
+        <h1>全国疫情中高风险地区查询</h1>
       </el-header>
       <el-main>
-        <RegionShow :data_url="data_url"></RegionShow>
+        <RegionShow :data_url="api_url"></RegionShow>
       </el-main>
     </el-container>
   </div>
@@ -17,6 +17,8 @@
 <script>
 import RegionShow from "@/components/RegionShow";
 import {Head} from '@vueuse/head'
+let dev_api_url = "http://localhost/latest.json"
+let prod_api_url = "https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json"
 
 export default {
   name: 'App',
@@ -26,9 +28,10 @@ export default {
   },
   data() {
     return {
-      title: "全国中高风险地区查询",
-      // data_url: "http://localhost/latest.json",
-      data_url: "https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json"
+      title: "全国疫情中高风险地区查询",
+      dev_api_url: "http://localhost/latest.json",
+      prod_api_url: "https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json",
+      api_url: process.env.NODE_ENV === 'development' ? dev_api_url : prod_api_url
     };
   }
 }
