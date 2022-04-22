@@ -5,17 +5,17 @@
     <el-input v-model="filter_text" placeholder="请输入区域名称" :disabled="!ok"></el-input>
     <h3 class="high-risk">
       高风险等级地区
-      <span class="num">({{ high_count }})</span>
+      <span class="num">({{ high.count }})</span>
       <el-button class="expand-all" type="primary" @click="high_expand" :disabled="!ok">
-        {{ high_expand_all_button }}
+        {{ high.expand_all_button }}
       </el-button>
     </h3>
     <el-tree
         v-if="ok"
-        :data="high_tree"
+        :data="high.tree"
         node-key="id"
-        :default-expand-all="high_expand_all"
-        :default-expanded-keys="high_default_id_list"
+        :default-expand-all="high.expand_all"
+        :default-expanded-keys="high.default_id_list"
         :auto-expand-parent="false"
         ref="high_tree"
         :filter-node-method="filter_high_node"
@@ -23,17 +23,17 @@
     <el-skeleton v-else :rows="6" animated />
     <h3 class="middle-risk">
       中风险等级地区
-      <span class="num">({{ middle_count }})</span>
+      <span class="num">({{ middle.count }})</span>
       <el-button class="expand-all" type="primary" @click="middle_expand" :disabled="!ok">
-        {{ middle_expand_all_button }}
+        {{ middle.expand_all_button }}
       </el-button>
     </h3>
     <el-tree
         v-if="ok"
-        :data="middle_tree"
+        :data="middle.tree"
         node-key="id"
-        :default-expand-all="middle_expand_all"
-        :default-expanded-keys="middle_default_id_list"
+        :default-expand-all="middle.expand_all"
+        :default-expanded-keys="middle.default_id_list"
         :auto-expand-parent="false"
         ref="middle_tree"
         :filter-node-method="filter_middle_node"
@@ -61,23 +61,26 @@ export default {
       err: false,
       err_msg: "",
 
-      high_tree: null,
-      high_city_id_list: null,
-      high_province_id_list: null,
-      high_county_id_list: null,
-      high_default_id_list: null,
-      high_count: 0,
-      high_expand_all: false,
-      high_expand_all_button: "展开",
-
-      middle_tree: null,
-      middle_city_id_list: null,
-      middle_province_id_list: null,
-      middle_county_id_list: null,
-      middle_default_id_list: null,
-      middle_count: 0,
-      middle_expand_all: false,
-      middle_expand_all_button: "展开",
+      high: {
+        tree: null,
+        count: '-',
+        province_id_list: [],
+        city_id_list: [],
+        county_id_list: [],
+        default_id_list: [],
+        expand_all: false,
+        expand_all_button: "展开",
+      },
+      middle: {
+        tree: null,
+        count: '-',
+        province_id_list: [],
+        city_id_list: [],
+        county_id_list: [],
+        default_id_list: [],
+        expand_all: false,
+        expand_all_button: "展开",
+      },
 
       filter_text: ""
     }
@@ -90,21 +93,22 @@ export default {
         .then(function (response) {
           let raw = response.data
           that.raw = raw
+          
           let high = list2tree(raw.data.highlist)
-          that.high_tree = high["tree"]
-          that.high_province_id_list = high["province_id_list"]
-          that.high_city_id_list = high["city_id_list"]
-          that.high_county_id_list = high["county_id_list"]
-          that.high_default_id_list = that.high_province_id_list.concat(that.high_county_id_list)
-          that.high_count = raw.data.hcount
+          that.high.tree = high["tree"]
+          that.high.province_id_list = high["province_id_list"]
+          that.high.city_id_list = high["city_id_list"]
+          that.high.county_id_list = high["county_id_list"]
+          that.high.default_id_list = high["default_id_list"]
+          that.high.count = raw.data.hcount
 
           let middle = list2tree(raw.data.middlelist)
-          that.middle_tree = middle["tree"]
-          that.middle_province_id_list = middle["province_id_list"]
-          that.middle_city_id_list = middle["city_id_list"]
-          that.middle_county_id_list = middle["county_id_list"]
-          that.middle_default_id_list = that.middle_province_id_list.concat(that.middle_county_id_list)
-          that.middle_count = raw.data.mcount
+          that.middle.tree = middle["tree"]
+          that.middle.province_id_list = middle["province_id_list"]
+          that.middle.city_id_list = middle["city_id_list"]
+          that.middle.county_id_list = middle["county_id_list"]
+          that.middle.default_id_list = middle["default_id_list"]
+          that.middle.count = raw.data.mcount
 
           that.ok = true
           // console.log(that.middle_tree)
@@ -117,43 +121,43 @@ export default {
   },
   methods: {
     high_expand() {
-      this.high_expand_all = !this.high_expand_all
-      if (this.high_expand_all) {
-        let id_list = this.high_default_id_list.concat(this.high_city_id_list)
+      this.high.expand_all = !this.high.expand_all
+      if (this.high.expand_all) {
+        let id_list = this.high.default_id_list.concat(this.high.city_id_list)
         for (let i = 0; i < id_list.length; i++) {
           this.$refs.high_tree.store.getNode(id_list[i]).expanded = true;
         }
       } else {
-        for (let i = 0; i < this.high_city_id_list.length; i++) {
-          this.$refs.high_tree.store.getNode(this.high_city_id_list[i]).expanded = false;
+        for (let i = 0; i < this.high.city_id_list.length; i++) {
+          this.$refs.high_tree.store.getNode(this.high.city_id_list[i]).expanded = false;
         }
       }
-      this.high_expand_all_button = this.high_expand_all ? "收起" : "展开"
+      this.high.expand_all_button = this.high.expand_all ? "收起" : "展开"
     },
     middle_expand() {
-      this.middle_expand_all = !this.middle_expand_all
-      if (this.middle_expand_all) {
-        let id_list = this.middle_default_id_list.concat(this.middle_city_id_list)
+      this.middle.expand_all = !this.middle.expand_all
+      if (this.middle.expand_all) {
+        let id_list = this.middle.default_id_list.concat(this.middle.city_id_list)
         for (let i = 0; i < id_list.length; i++) {
           this.$refs.middle_tree.store.getNode(id_list[i]).expanded = true;
         }
       } else {
-        for (let i = 0; i < this.middle_city_id_list.length; i++) {
-          this.$refs.middle_tree.store.getNode(this.middle_city_id_list[i]).expanded = false;
+        for (let i = 0; i < this.middle.city_id_list.length; i++) {
+          this.$refs.middle_tree.store.getNode(this.middle.city_id_list[i]).expanded = false;
         }
       }
-      this.middle_expand_all_button = this.middle_expand_all ? "收起" : "展开"
+      this.middle.expand_all_button = this.middle.expand_all ? "收起" : "展开"
     },
     filter_high_node(value, data) {
       if (!value) {
         if (data.children === undefined) {
-          this.high_count++
+          this.high.count++
         }
         return true
       }
       if (data.label.includes(value)) {
         if (data.children === undefined) {
-          this.high_count++
+          this.high.count++
         }
         return true
       }
@@ -162,7 +166,7 @@ export default {
         let parent_node = this.$refs.high_tree.store.getNode(parent_id).data
         if (parent_node.label.includes(value)) {
           if (data.children === undefined) {
-            this.high_count++
+            this.high.count++
           }
           return true
         }
@@ -173,13 +177,13 @@ export default {
     filter_middle_node(value, data) {
       if (!value) {
         if (data.children === undefined) {
-          this.middle_count++
+          this.middle.count++
         }
         return true
       }
       if (data.label.includes(value)) {
         if (data.children === undefined) {
-          this.middle_count++
+          this.middle.count++
         }
         return true
       }
@@ -188,7 +192,7 @@ export default {
         let parent_node = this.$refs.middle_tree.store.getNode(parent_id).data
         if (parent_node.label.includes(value)) {
           if (data.children === undefined) {
-            this.middle_count++
+            this.middle.count++
           }
           return true
         }
@@ -199,9 +203,9 @@ export default {
   },
   watch: {
     filter_text(value) {
-      this.high_count = 0
+      this.high.count = 0
       this.$refs.high_tree.filter(value)
-      this.middle_count = 0
+      this.middle.count = 0
       this.$refs.middle_tree.filter(value)
     }
   }
@@ -215,10 +219,10 @@ function list2tree(list) {
   let county_id_list = []
   for (let i = 0; i < list.length; i++) {
     let item = list[i]
-    let province = item.province
+    let province = item["province"]
     let city = item.city
-    let county = item.county
-    let communitys = item.communitys
+    let county = item["county"]
+    let communitys = item["communitys"]
     let province_item = null
     let city_item = null
     let county_item = null
@@ -301,7 +305,8 @@ function list2tree(list) {
     "tree": tree,
     "province_id_list": province_id_list,
     "city_id_list": city_id_list,
-    "county_id_list": county_id_list
+    "county_id_list": county_id_list,
+    "default_id_list": province_id_list.concat(county_id_list)
   }
 
 }
