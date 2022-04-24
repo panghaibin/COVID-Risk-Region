@@ -9,7 +9,7 @@
         placeholder="请输入区域名称"
         clearable
         @clear="filter_history_trigger"
-        @change="add_tag"
+        @change="tag_add"
     >
     </el-input>
     <div class="tag-list">
@@ -40,7 +40,7 @@
         :default-expanded-keys="high.default_id_list"
         :auto-expand-parent="false"
         ref="high_tree"
-        :filter-node-method="filter_high_node"
+        :filter-node-method="high_filter"
         empty-text="无数据"
     />
     <el-skeleton v-else :rows="6" animated/>
@@ -60,7 +60,7 @@
         :default-expanded-keys="middle.default_id_list"
         :auto-expand-parent="false"
         ref="middle_tree"
-        :filter-node-method="filter_middle_node"
+        :filter-node-method="middle_filter"
         empty-text="无数据"
     />
     <el-skeleton v-else :rows="6" animated/>
@@ -268,7 +268,7 @@ export default {
       }
       this.middle.expand_all_button = this.middle.expand_all ? "收起" : "展开"
     },
-    filter_high_node(value, data) {
+    high_filter(value, data) {
       if (!value) {
         if (data.children === undefined) {
           this.high.count++
@@ -294,7 +294,7 @@ export default {
       }
       return false
     },
-    filter_middle_node(value, data) {
+    middle_filter(value, data) {
       if (!value) {
         if (data.children === undefined) {
           this.middle.count++
@@ -322,13 +322,14 @@ export default {
     },
     filter_history_trigger(trigger_by_clear=true, value="") {
       if (trigger_by_clear) {
+        // save to tag list only by clicking the clear button, not by manually deleting
         this.history_ready = true
       } else if (this.history_ready) {
-        this.add_tag(value)
+        this.tag_add(value)
         this.history_ready = false
       }
     },
-    add_tag(item){
+    tag_add(item){
       item = item.trim()
       if (item === "") {
         return
