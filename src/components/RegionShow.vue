@@ -94,24 +94,12 @@ export default {
           let raw = response.data
           that.raw = raw
           
-          let high = list2tree(raw.data.highlist)
-          that.high.tree = high["tree"]
-          that.high.province_id_list = high["province_id_list"]
-          that.high.city_id_list = high["city_id_list"]
-          that.high.county_id_list = high["county_id_list"]
-          that.high.default_id_list = high["default_id_list"]
+          list2tree(raw.data.highlist, that.high)
           that.high.count = raw.data.hcount
-
-          let middle = list2tree(raw.data.middlelist)
-          that.middle.tree = middle["tree"]
-          that.middle.province_id_list = middle["province_id_list"]
-          that.middle.city_id_list = middle["city_id_list"]
-          that.middle.county_id_list = middle["county_id_list"]
-          that.middle.default_id_list = middle["default_id_list"]
+          list2tree(raw.data.middlelist, that.middle)
           that.middle.count = raw.data.mcount
 
           that.ok = true
-          // console.log(that.middle_tree)
         })
         .catch(function (error) {
           console.log(error)
@@ -211,7 +199,7 @@ export default {
   }
 }
 
-function list2tree(list) {
+function list2tree(list, data) {
   let tree = []
   let id_count = 0
   let province_id_list = []
@@ -301,13 +289,11 @@ function list2tree(list) {
       }
     }
   }
-  return {
-    "tree": tree,
-    "province_id_list": province_id_list,
-    "city_id_list": city_id_list,
-    "county_id_list": county_id_list,
-    "default_id_list": province_id_list.concat(county_id_list)
-  }
+  data.tree = tree
+  data.province_id_list = province_id_list
+  data.city_id_list = city_id_list
+  data.county_id_list = county_id_list
+  data.default_id_list = province_id_list.concat(county_id_list)
 
 }
 
