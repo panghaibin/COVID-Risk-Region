@@ -12,7 +12,7 @@
         @change="tag_add"
     >
     </el-input>
-    <div class="tag-list">
+    <div :class="ok ? 'tag-list' : 'tag-list tag-list-disabled'">
       <el-tag
           v-for="(item, index) in filter_history"
           :key="index"
@@ -399,6 +399,11 @@ export default {
   display: inline-block;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
+}
+
+.tag-list-disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 </style>
 <style>
