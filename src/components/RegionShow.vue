@@ -21,7 +21,7 @@
         ref="high_tree"
         :filter-node-method="filter_high_node"
     />
-    <el-skeleton v-else :rows="6" animated />
+    <el-skeleton v-else :rows="6" animated/>
     <h3 class="middle-risk">
       中风险等级地区
       <span class="num">({{ middle.count }})</span>
@@ -40,7 +40,7 @@
         ref="middle_tree"
         :filter-node-method="filter_middle_node"
     />
-    <el-skeleton v-else :rows="6" animated />
+    <el-skeleton v-else :rows="6" animated/>
   </div>
   <div v-else>
     <p>API 获取出错，刷新重试</p>
@@ -100,7 +100,7 @@ export default {
         .then(function (response) {
           let raw = response.data
           that.raw = raw
-          
+
           list2tree(raw.data.highlist, that.high)
           that.high.count = raw.data.hcount
           list2tree(raw.data.middlelist, that.middle)
@@ -285,7 +285,6 @@ function list2tree(list, data) {
       }
     }
     if (communitys_item === null) {
-      // console.log('communitys_item', communitys)
       communitys_item = []
       for (let j = 0; j < communitys.length; j++) {
         county_item.children.push({
