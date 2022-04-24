@@ -18,7 +18,7 @@
 import RegionShow from "@/components/RegionShow";
 import {Head} from '@vueuse/head'
 let dev_api_url = "http://localhost/latest.json"
-let prod_api_url = "https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json"
+let prod_api_url = "https://gh.hbtech.workers.dev/https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json"
 
 export default {
   name: 'App',
@@ -29,8 +29,6 @@ export default {
   data() {
     return {
       title: "全国疫情中高风险地区查询",
-      dev_api_url: "http://localhost/latest.json",
-      prod_api_url: "https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json",
       api_url: process.env.NODE_ENV === 'development' ? dev_api_url : prod_api_url
     };
   }
