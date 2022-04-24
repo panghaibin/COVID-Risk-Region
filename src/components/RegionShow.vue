@@ -123,7 +123,10 @@ export default {
     }
   },
   mounted() {
-    if (localStorage.getItem("filter_history")) {
+    if (localStorage.getItem("filter_history")
+        && localStorage.getItem("filter_history") !== ""
+        && localStorage.getItem("filter_history") !== "[]"
+    ) {
       this.filter_history = JSON.parse(localStorage.getItem("filter_history"));
     } else {
       localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
