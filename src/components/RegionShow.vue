@@ -327,7 +327,7 @@ export default {
       }
       return false
     },
-    filter_history_trigger(trigger_by_clear=true, value="") {
+    filter_history_trigger(trigger_by_clear = true, value = "") {
       if (trigger_by_clear) {
         // save to tag list only by clicking the clear button, not by manually deleting
         this.history_ready = true
@@ -336,7 +336,7 @@ export default {
         this.history_ready = false
       }
     },
-    tag_add(item){
+    tag_add(item) {
       item = item.trim()
       if (item === "") {
         return
