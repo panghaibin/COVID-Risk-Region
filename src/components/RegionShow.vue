@@ -2,7 +2,7 @@
   <div v-if="!err">
     <p v-if="ok">以下信息截止自{{ raw.data.end_update_time }}</p>
     <p v-else>加载中……</p>
-    <el-input v-model="filter_text" placeholder="请输入区域名称" :disabled="!ok"></el-input>
+    <el-input v-model="filter_text" placeholder="请输入区域名称" :disabled="!ok" clearable></el-input>
     <h3 class="high-risk">
       高风险等级地区
       <span class="num">({{ high.count }})</span>
@@ -20,6 +20,7 @@
         :auto-expand-parent="false"
         ref="high_tree"
         :filter-node-method="filter_high_node"
+        empty-text="无数据"
     />
     <el-skeleton v-else :rows="6" animated/>
     <h3 class="middle-risk">
@@ -39,6 +40,7 @@
         :auto-expand-parent="false"
         ref="middle_tree"
         :filter-node-method="filter_middle_node"
+        empty-text="无数据"
     />
     <el-skeleton v-else :rows="6" animated/>
   </div>
