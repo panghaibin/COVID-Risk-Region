@@ -13,6 +13,7 @@
     <el-tree
         v-if="ok"
         :data="high.tree"
+        :props="tree_props"
         node-key="id"
         :default-expand-all="high.expand_all"
         :default-expanded-keys="high.default_id_list"
@@ -31,6 +32,7 @@
     <el-tree
         v-if="ok"
         :data="middle.tree"
+        :props="tree_props"
         node-key="id"
         :default-expand-all="middle.expand_all"
         :default-expanded-keys="middle.default_id_list"
@@ -82,6 +84,11 @@ export default {
         expand_all_button: "展开",
       },
 
+      tree_props: {
+        label: 'label',
+        children: 'children',
+        class: 'tree-node',
+      },
       filter_text: ""
     }
   },
@@ -322,5 +329,15 @@ function list2tree(list, data) {
   min-height: 2em;
   max-height: 100%;
 }
-
+</style>
+<style>
+.el-tree-node__content {
+  height: auto;
+}
+.el-tree-node {
+  white-space: break-spaces;
+}
+.tree-node {
+  padding: 1px;
+}
 </style>
