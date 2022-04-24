@@ -53,18 +53,16 @@ export default {
 }
 
 .header {
-  background-color: #f4f4f5;
+  background-color: #ecf5ff;
+  color: #337ecc;
   height: auto !important;
   text-align: center;
   border-radius: 5px;
 }
 
 .footer {
-  background-color: #f4f4f5;
   bottom: 0;
   height: auto;
   text-align: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
 }
 </style>
