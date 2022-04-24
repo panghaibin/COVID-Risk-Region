@@ -2,7 +2,28 @@
   <div v-if="!err">
     <p v-if="ok">以下信息截止自{{ raw.data.end_update_time }}</p>
     <p v-else>加载中……</p>
-    <el-input v-model="filter_text" placeholder="请输入区域名称" :disabled="!ok" clearable></el-input>
+    <el-input
+        :disabled="!ok"
+        ref="filter_input"
+        v-model="filter_text"
+        placeholder="请输入区域名称"
+        clearable
+        @clear="filter_history_trigger"
+        @change="add_tag"
+    >
+    </el-input>
+    <div class="tag-list">
+      <el-tag
+          v-for="(item, index) in filter_history"
+          :key="index"
+          :closable="true"
+          @close="tag_close(index)"
+          @click="filter_text=item;$refs.filter_input.focus()"
+          class="tag-item"
+      >
+        {{ item }}
+      </el-tag>
+    </div>
     <h3 class="high-risk">
       高风险等级地区
       <span class="num">({{ high.count }})</span>
@@ -91,7 +112,14 @@ export default {
         children: 'children',
         class: 'tree-node',
       },
-      filter_text: ""
+
+      filter_text: "",
+      history_ready: false,
+      filter_history: [
+        "北京",
+        "上海",
+        "江苏",
+      ],
     }
   },
   mounted() {
@@ -197,9 +225,31 @@ export default {
       }
       return false
     },
+    filter_history_trigger(trigger_by_clear=true, value="") {
+      if (trigger_by_clear) {
+        this.history_ready = true
+      } else if (this.history_ready) {
+        this.add_tag(value)
+        this.history_ready = false
+      }
+    },
+    add_tag(item){
+      item = item.trim()
+      if (item === "") {
+        return
+      }
+      this.filter_history.unshift(item)
+      this.filter_history = Array.from(new Set(this.filter_history))
+    },
+    tag_close(index) {
+      this.filter_history.splice(index, 1)
+    },
   },
   watch: {
-    filter_text(value) {
+    filter_text(value, old_value) {
+      if (value === "") {
+        this.filter_history_trigger(false, old_value)
+      }
       this.high.count = 0
       this.$refs.high_tree.filter(value)
       this.middle.count = 0
@@ -329,6 +379,18 @@ function list2tree(list, data) {
   padding-bottom: 0;
   min-height: 2em;
   max-height: 100%;
+}
+
+.tag-item {
+  /*font-size: 14px;*/
+  cursor: pointer;
+  margin: 0.25rem;
+}
+
+.tag-list {
+  display: inline-block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }
 </style>
 <style>
