@@ -131,9 +131,9 @@ export default {
           let raw = response.data
           that.raw = raw
 
-          list2tree(raw.data.highlist, that.high)
+          that.list2tree(raw.data.highlist, that.high)
           that.high.count = raw.data.hcount
-          list2tree(raw.data.middlelist, that.middle)
+          that.list2tree(raw.data.middlelist, that.middle)
           that.middle.count = raw.data.mcount
 
           that.ok = true
@@ -145,6 +145,101 @@ export default {
         })
   },
   methods: {
+    list2tree(list, data) {
+      let tree = []
+      let id_count = 0
+      let province_id_list = []
+      let city_id_list = []
+      let county_id_list = []
+      for (let i = 0; i < list.length; i++) {
+        let item = list[i]
+        let province = item["province"]
+        let city = item.city
+        let county = item["county"]
+        let communitys = item["communitys"]
+        let province_item = null
+        let city_item = null
+        let county_item = null
+        let communitys_item = null
+        for (let j = 0; j < tree.length; j++) {
+          let tree_item = tree[j]
+          if (tree_item.label === province) {
+            province_item = tree_item
+            break
+          }
+        }
+        if (province_item === null) {
+          province_item = {
+            id: id_count++,
+            pid: -1,
+            label: province,
+            children: [],
+            expanded: true
+          }
+          tree.push(province_item)
+          province_id_list.push(province_item.id)
+        }
+        for (let j = 0; j < province_item.children.length; j++) {
+          let province_item_child = province_item.children[j]
+          if (province_item_child.label === city) {
+            city_item = province_item_child
+            break
+          }
+        }
+        if (city_item === null) {
+          city_item = {
+            id: id_count++,
+            pid: province_item.id,
+            label: city,
+            children: [],
+            expanded: true
+          }
+          province_item.children.push(city_item)
+          city_id_list.push(city_item.id)
+        }
+
+        for (let j = 0; j < city_item.children.length; j++) {
+          let city_item_child = city_item.children[j]
+          if (city_item_child.label === county) {
+            county_item = city_item_child
+            break
+          }
+        }
+        if (county_item === null) {
+          county_item = {
+            id: id_count++,
+            pid: city_item.id,
+            label: county,
+            children: [],
+            expanded: true
+          }
+          city_item.children.push(county_item)
+          county_id_list.push(county_item.id)
+        }
+        for (let j = 0; j < county_item.children.length; j++) {
+          let county_item_child = county_item.children[j]
+          if (county_item_child.label === communitys) {
+            communitys_item = county_item_child
+            break
+          }
+        }
+        if (communitys_item === null) {
+          communitys_item = []
+          for (let j = 0; j < communitys.length; j++) {
+            county_item.children.push({
+              id: id_count++,
+              pid: county_item.id,
+              label: communitys[j]
+            })
+          }
+        }
+      }
+      data.tree = tree
+      data.province_id_list = province_id_list
+      data.city_id_list = city_id_list
+      data.county_id_list = county_id_list
+      data.default_id_list = province_id_list.concat(county_id_list)
+    },
     high_expand() {
       this.high.expand_all = !this.high.expand_all
       if (this.high.expand_all) {
@@ -256,103 +351,6 @@ export default {
       this.$refs.middle_tree.filter(value)
     }
   }
-}
-
-function list2tree(list, data) {
-  let tree = []
-  let id_count = 0
-  let province_id_list = []
-  let city_id_list = []
-  let county_id_list = []
-  for (let i = 0; i < list.length; i++) {
-    let item = list[i]
-    let province = item["province"]
-    let city = item.city
-    let county = item["county"]
-    let communitys = item["communitys"]
-    let province_item = null
-    let city_item = null
-    let county_item = null
-    let communitys_item = null
-    for (let j = 0; j < tree.length; j++) {
-      let tree_item = tree[j]
-      if (tree_item.label === province) {
-        province_item = tree_item
-        break
-      }
-    }
-    if (province_item === null) {
-      province_item = {
-        id: id_count++,
-        pid: -1,
-        label: province,
-        children: [],
-        expanded: true
-      }
-      tree.push(province_item)
-      province_id_list.push(province_item.id)
-    }
-    for (let j = 0; j < province_item.children.length; j++) {
-      let province_item_child = province_item.children[j]
-      if (province_item_child.label === city) {
-        city_item = province_item_child
-        break
-      }
-    }
-    if (city_item === null) {
-      city_item = {
-        id: id_count++,
-        pid: province_item.id,
-        label: city,
-        children: [],
-        expanded: true
-      }
-      province_item.children.push(city_item)
-      city_id_list.push(city_item.id)
-    }
-
-    for (let j = 0; j < city_item.children.length; j++) {
-      let city_item_child = city_item.children[j]
-      if (city_item_child.label === county) {
-        county_item = city_item_child
-        break
-      }
-    }
-    if (county_item === null) {
-      county_item = {
-        id: id_count++,
-        pid: city_item.id,
-        label: county,
-        children: [],
-        expanded: true
-      }
-      city_item.children.push(county_item)
-      county_id_list.push(county_item.id)
-    }
-    for (let j = 0; j < county_item.children.length; j++) {
-      let county_item_child = county_item.children[j]
-      if (county_item_child.label === communitys) {
-        communitys_item = county_item_child
-        break
-      }
-    }
-    if (communitys_item === null) {
-      communitys_item = []
-      for (let j = 0; j < communitys.length; j++) {
-        county_item.children.push({
-          id: id_count++,
-          pid: county_item.id,
-          label: communitys[j]
-        })
-      }
-    }
-  }
-  data.tree = tree
-  data.province_id_list = province_id_list
-  data.city_id_list = city_id_list
-  data.county_id_list = county_id_list
-  data.default_id_list = province_id_list.concat(county_id_list)
-
 }
 
 </script>
