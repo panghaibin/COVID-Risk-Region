@@ -17,7 +17,7 @@
           v-for="(item, index) in filter_history"
           :key="index"
           :closable="true"
-          @close="tag_close(index)"
+          @close="tag_remove(index)"
           @click="filter_text=item;$refs.filter_input.focus()"
           class="tag-item"
       >
@@ -123,7 +123,11 @@ export default {
     }
   },
   mounted() {
-    // window.vue = this;
+    if (localStorage.getItem("filter_history")) {
+      this.filter_history = JSON.parse(localStorage.getItem("filter_history"));
+    } else {
+      localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
+    }
     let that = this
     axios
         .get(this.data_url)
@@ -336,9 +340,11 @@ export default {
       }
       this.filter_history.unshift(item)
       this.filter_history = Array.from(new Set(this.filter_history))
+      localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
     },
-    tag_close(index) {
+    tag_remove(index) {
       this.filter_history.splice(index, 1)
+      localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
     },
   },
   watch: {
