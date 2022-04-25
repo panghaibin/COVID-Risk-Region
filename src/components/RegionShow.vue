@@ -12,13 +12,13 @@
         @change="tag_add"
     >
     </el-input>
-    <div :class="ok ? 'tag-list' : 'tag-list tag-list-disabled'">
+    <div :class="ok ? 'tag-list' : ['tag-list', 'tag-list-disabled']">
       <el-tag
           v-for="(item, index) in filter_history"
           :key="index"
           :closable="true"
           @close="tag_remove(index)"
-          @click="filter_text=item;$refs.filter_input.focus()"
+          @click="filter_text=item;$refs.filter_input.focus();"
           class="tag-item"
       >
         {{ item }}
@@ -282,22 +282,29 @@ export default {
         }
         return true
       }
-      if (data.label.includes(value)) {
-        if (data.children === undefined) {
-          this.high.count++
+      let value_list = value.split(" ")
+      for (let i = 0; i < value_list.length; i++) {
+        let value = value_list[i]
+        if (!value) {
+          continue
         }
-        return true
-      }
-      let parent_id = data.pid
-      while (parent_id !== -1) {
-        let parent_node = this.$refs.high_tree.store.getNode(parent_id).data
-        if (parent_node.label.includes(value)) {
+        if (data.label.includes(value)) {
           if (data.children === undefined) {
             this.high.count++
           }
           return true
         }
-        parent_id = parent_node.pid
+        let parent_id = data.pid
+        while (parent_id !== -1) {
+          let parent_node = this.$refs.high_tree.store.getNode(parent_id).data
+          if (parent_node.label.includes(value)) {
+            if (data.children === undefined) {
+              this.high.count++
+            }
+            return true
+          }
+          parent_id = parent_node.pid
+        }
       }
       return false
     },
@@ -308,22 +315,29 @@ export default {
         }
         return true
       }
-      if (data.label.includes(value)) {
-        if (data.children === undefined) {
-          this.middle.count++
+      let value_list = value.split(" ")
+      for (let i = 0; i < value_list.length; i++) {
+        let value = value_list[i]
+        if (!value) {
+          continue
         }
-        return true
-      }
-      let parent_id = data.pid
-      while (parent_id !== -1) {
-        let parent_node = this.$refs.middle_tree.store.getNode(parent_id).data
-        if (parent_node.label.includes(value)) {
+        if (data.label.includes(value)) {
           if (data.children === undefined) {
             this.middle.count++
           }
           return true
         }
-        parent_id = parent_node.pid
+        let parent_id = data.pid
+        while (parent_id !== -1) {
+          let parent_node = this.$refs.middle_tree.store.getNode(parent_id).data
+          if (parent_node.label.includes(value)) {
+            if (data.children === undefined) {
+              this.middle.count++
+            }
+            return true
+          }
+          parent_id = parent_node.pid
+        }
       }
       return false
     },
@@ -352,8 +366,16 @@ export default {
   },
   watch: {
     filter_text(value, old_value) {
-      if (value === "") {
+      value = value.trim()
+      old_value = old_value.trim()
+      if (value === "" && old_value !== "") {
+        while (old_value.includes("  ")) {
+          old_value = old_value.replace("  ", " ")
+        }
         this.filter_history_trigger(false, old_value)
+      }
+      while (value.includes("  ")) {
+        value = value.replace("  ", " ")
       }
       this.high.count = 0
       this.$refs.high_tree.filter(value)
