@@ -2,7 +2,7 @@
   <Head>
     <title>{{ title }}</title>
   </Head>
-  <el-scrollbar height="100vh" :noresize="true">
+  <el-scrollbar height="100vh">
     <div class="content-body">
       <div class="content">
         <el-container>
