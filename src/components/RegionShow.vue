@@ -8,8 +8,9 @@
         v-model="filter_text"
         placeholder="请输入区域名称"
         clearable
-        @clear="filter_history_trigger"
+        @clear="tag_add($refs.filter_input.input.value)"
         @change="tag_add"
+        @blur="tag_add($refs.filter_input.input.value)"
     >
     </el-input>
     <div :class="ok ? 'tag-list' : ['tag-list', 'tag-list-disabled']">
@@ -18,7 +19,7 @@
           :key="index"
           :closable="true"
           @close="tag_remove(index)"
-          @click="filter_text=item;$refs.filter_input.focus();"
+          @click="$refs.filter_input.focus();filter_text=item;tag_add(item)"
           class="tag-item"
       >
         {{ item }}
@@ -27,7 +28,7 @@
     <h3 class="high-risk">
       高风险等级地区
       <span class="num">({{ high.count }})</span>
-      <el-button class="expand-all" type="primary" @click="high_expand" :disabled="!ok">
+      <el-button ref="high_button" class="expand-all" type="primary" @click="high_expand" :disabled="!ok">
         {{ high.expand_all_button }}
       </el-button>
     </h3>
@@ -114,7 +115,6 @@ export default {
       },
 
       filter_text: "",
-      history_ready: false,
       filter_history: [
         "北京",
         "上海",
@@ -123,6 +123,9 @@ export default {
     }
   },
   mounted() {
+    if (process.env.NODE_ENV === 'development') {
+      window.vue = this;
+    }
     let that = this
     axios
         .get(this.data_url)
@@ -341,19 +344,13 @@ export default {
       }
       return false
     },
-    filter_history_trigger(trigger_by_clear = true, value = "") {
-      if (trigger_by_clear) {
-        // save to tag list only by clicking the clear button, not by manually deleting
-        this.history_ready = true
-      } else if (this.history_ready) {
-        this.tag_add(value)
-        this.history_ready = false
-      }
-    },
     tag_add(item) {
       item = item.trim()
       if (item === "") {
         return
+      }
+      while (item.includes("  ")) {
+        item = item.replace("  ", " ")
       }
       this.filter_history.unshift(item)
       this.filter_history = Array.from(new Set(this.filter_history))
@@ -365,15 +362,8 @@ export default {
     },
   },
   watch: {
-    filter_text(value, old_value) {
+    filter_text(value) {
       value = value.trim()
-      old_value = old_value.trim()
-      if (value === "" && old_value !== "") {
-        while (old_value.includes("  ")) {
-          old_value = old_value.replace("  ", " ")
-        }
-        this.filter_history_trigger(false, old_value)
-      }
       while (value.includes("  ")) {
         value = value.replace("  ", " ")
       }
