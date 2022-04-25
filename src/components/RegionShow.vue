@@ -132,7 +132,11 @@ export default {
       this.middle_init();
       this.ok = true;
     }
-    this.fetch_data(this.data_url + "?t=" + new Date().getTime());
+    if (!localStorage.getItem("latest_timestamp")
+        || (new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000
+    ) {
+      this.fetch_data(this.data_url + "?t=" + new Date().getTime());
+    }
     if (localStorage.getItem("filter_history")
         && localStorage.getItem("filter_history") !== ""
         && localStorage.getItem("filter_history") !== "[]"
@@ -176,6 +180,7 @@ export default {
               that.ok = true
               localStorage.setItem("latest", JSON.stringify(raw));
             }
+            localStorage.setItem("latest_timestamp", new Date().getTime().toString());
           })
           .catch(function (error) {
             console.log(error)
