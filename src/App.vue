@@ -2,19 +2,23 @@
   <Head>
     <title>{{ title }}</title>
   </Head>
-  <div class="content">
-    <el-container>
-      <el-header class="header">
-        <h1>全国疫情中高风险地区查询</h1>
-      </el-header>
-      <el-main>
-        <RegionShow :data_url="api_url"></RegionShow>
-      </el-main>
-      <el-footer class="footer">
-        <FooterShow></FooterShow>
-      </el-footer>
-    </el-container>
-  </div>
+  <el-scrollbar height="100vh" :noresize="true">
+    <div class="content-body">
+      <div class="content">
+        <el-container>
+          <el-header class="header">
+            <h1>全国疫情中高风险地区查询</h1>
+          </el-header>
+          <el-main>
+            <RegionShow :data_url="api_url"></RegionShow>
+          </el-main>
+          <el-footer class="footer">
+            <FooterShow></FooterShow>
+          </el-footer>
+        </el-container>
+      </div>
+    </div>
+  </el-scrollbar>
 </template>
 
 <script>
@@ -42,6 +46,14 @@ export default {
 </script>
 
 <style>
+html, body {
+  margin: 0;
+}
+
+.content-body {
+  margin: 8px;
+}
+
 .content {
   max-width: 900px;
   min-width: 350px;
