@@ -123,14 +123,6 @@ export default {
     }
   },
   mounted() {
-    if (localStorage.getItem("filter_history")
-        && localStorage.getItem("filter_history") !== ""
-        && localStorage.getItem("filter_history") !== "[]"
-    ) {
-      this.filter_history = JSON.parse(localStorage.getItem("filter_history"));
-    } else {
-      localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
-    }
     let that = this
     axios
         .get(this.data_url)
@@ -150,6 +142,14 @@ export default {
           that.err_msg = error
           that.err = true
         })
+    if (localStorage.getItem("filter_history")
+        && localStorage.getItem("filter_history") !== ""
+        && localStorage.getItem("filter_history") !== "[]"
+    ) {
+      this.filter_history = JSON.parse(localStorage.getItem("filter_history"));
+    } else {
+      localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
+    }
   },
   methods: {
     list2tree(list, data) {
