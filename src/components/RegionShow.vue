@@ -10,7 +10,6 @@
         clearable
         @clear="tag_add($refs.filter_input.input.value)"
         @change="tag_add"
-        @blur="tag_add($refs.filter_input.input.value)"
     >
     </el-input>
     <div :class="ok ? 'tag-list' : ['tag-list', 'tag-list-disabled']">
@@ -67,13 +66,14 @@
     <el-skeleton v-else :rows="6" animated/>
   </div>
   <div v-else>
-    <p>API 获取出错，刷新重试</p>
+    <p>API 获取出错，请刷新重试</p>
     <p>{{ err_msg }}</p>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"
+import { ElNotification } from 'element-plus'
 
 export default {
   name: "RegionShow",
@@ -126,25 +126,13 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       window.vue = this;
     }
-    let that = this
-    axios
-        .get(this.data_url)
-        .then(function (response) {
-          let raw = response.data
-          that.raw = raw
-
-          that.list2tree(raw.data.highlist, that.high)
-          that.high.count = raw.data.hcount
-          that.list2tree(raw.data.middlelist, that.middle)
-          that.middle.count = raw.data.mcount
-
-          that.ok = true
-        })
-        .catch(function (error) {
-          console.log(error)
-          that.err_msg = error
-          that.err = true
-        })
+    if (localStorage.getItem("latest")) {
+      this.raw = JSON.parse(localStorage.getItem("latest"));
+      this.high_init();
+      this.middle_init();
+      this.ok = true;
+    }
+    this.fetch_data(this.data_url + "?t=" + new Date().getTime());
     if (localStorage.getItem("filter_history")
         && localStorage.getItem("filter_history") !== ""
         && localStorage.getItem("filter_history") !== "[]"
@@ -155,6 +143,59 @@ export default {
     }
   },
   methods: {
+    fetch_data: function (url) {
+      let that = this
+      axios
+          .get(url)
+          .then(function (response) {
+            let raw = response.data
+            let msg
+            let update_required = false
+            if (that.ok) {
+              if (that.raw.data["end_update_time"] !== raw.data["end_update_time"]) {
+                msg = "数据更新成功"
+                update_required = true
+              } else {
+                msg = "已是最新数据"
+              }
+            } else {
+              msg = "数据加载成功"
+              update_required = true
+            }
+            ElNotification.success({
+              message: msg,
+              duration: 2500,
+              position: 'bottom-right',
+              showClose: false,
+              customClass: 'notification-item',
+            })
+            if (update_required) {
+              that.raw = raw
+              that.high_init()
+              that.middle_init()
+              that.ok = true
+              localStorage.setItem("latest", JSON.stringify(raw));
+            }
+          })
+          .catch(function (error) {
+            console.log(error)
+            let msg
+            if (that.ok) {
+              msg = "数据更新失败<br>已显示缓存数据"
+              ElNotification.info({
+                message: msg,
+                duration: 2500,
+                position: 'bottom-right',
+                showClose: false,
+                customClass: 'notification-item',
+                dangerouslyUseHTMLString: true,
+              })
+            } else {
+              that.err_msg = error
+              that.err = true
+            }
+          })
+    },
     list2tree(list, data) {
       let tree = []
       let id_count = 0
@@ -249,6 +290,14 @@ export default {
       data.city_id_list = city_id_list
       data.county_id_list = county_id_list
       data.default_id_list = province_id_list.concat(county_id_list)
+    },
+    high_init() {
+      this.list2tree(this.raw.data["highlist"], this.high)
+      this.high.count = this.raw.data["hcount"]
+    },
+    middle_init() {
+      this.list2tree(this.raw.data["middlelist"], this.middle)
+      this.middle.count = this.raw.data["mcount"]
     },
     high_expand() {
       this.high.expand_all = !this.high.expand_all
@@ -434,5 +483,9 @@ export default {
 
 .tree-node {
   padding: 1px;
+}
+
+.notification-item {
+  width: 230px;
 }
 </style>
