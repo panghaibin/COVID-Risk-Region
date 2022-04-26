@@ -126,16 +126,16 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       window.vue = this;
     }
-    if (!localStorage.getItem("latest_timestamp")
-        || !localStorage.getItem("latest")
-        || (new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000
-    ) {
+    if (!localStorage.getItem("latest_timestamp") || !localStorage.getItem("latest")) {
       this.fetch_data(this.data_url + "?t=" + new Date().getTime());
     } else {
       this.raw = JSON.parse(localStorage.getItem("latest"));
       this.high_init();
       this.middle_init();
       this.ok = true;
+      if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
+        this.fetch_data(this.data_url + "?t=" + new Date().getTime());
+      }
     }
     if (localStorage.getItem("filter_history")
         && localStorage.getItem("filter_history") !== ""
