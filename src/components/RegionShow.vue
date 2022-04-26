@@ -150,11 +150,20 @@ export default {
   methods: {
     fetch_data: function (url, use_proxy) {
       let new_url
+      let timeout_time
       use_proxy ? new_url = "https://gh.hbtech.workers.dev/" + url : new_url = url;
+      use_proxy ? timeout_time = 10000 : timeout_time = 3000;
+      let CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+      const timeout = setTimeout(() => {
+        source.cancel();
+      }, timeout_time);
+
       let that = this
       axios
-          .get(new_url)
+          .get(new_url, {cancelToken: source.token})
           .then(function (response) {
+            clearTimeout(timeout);
             let raw = response.data
             let msg
             let update_required = false
@@ -187,6 +196,7 @@ export default {
             localStorage.setItem("use_proxy", use_proxy.toString());
           })
           .catch(function (error) {
+            clearTimeout(timeout);
             console.log(error)
             if (!use_proxy) {
               that.fetch_data(url, true)

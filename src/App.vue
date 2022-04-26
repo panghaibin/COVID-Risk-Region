@@ -7,7 +7,7 @@
       <div class="content">
         <el-container>
           <el-header class="header">
-            <h1>全国疫情中高风险地区查询</h1>
+            <h1>{{ title }}</h1>
           </el-header>
           <el-main>
             <RegionShow :data_url="api_url"></RegionShow>
@@ -25,6 +25,7 @@
 import RegionShow from "@/components/RegionShow";
 import FooterShow from "@/components/FooterShow";
 import {Head} from '@vueuse/head'
+import update from './mixins/update'
 
 let dev_api_url = "http://localhost/latest.json"
 let prod_api_url = "https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json"
@@ -41,7 +42,8 @@ export default {
       title: "全国疫情中高风险地区查询",
       api_url: process.env.NODE_ENV === 'development' ? dev_api_url : prod_api_url
     };
-  }
+  },
+  mixins: [update],
 }
 </script>
 
