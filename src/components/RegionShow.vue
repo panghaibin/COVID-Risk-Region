@@ -73,7 +73,7 @@
 
 <script>
 import axios from "axios"
-import { ElNotification } from 'element-plus'
+import {ElNotification} from 'element-plus'
 
 export default {
   name: "RegionShow",
@@ -126,15 +126,16 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       window.vue = this;
     }
+    let use_proxy = localStorage.getItem("use_proxy") === "true";
     if (!localStorage.getItem("latest_timestamp") || !localStorage.getItem("latest")) {
-      this.fetch_data(this.data_url + "?t=" + new Date().getTime());
+      this.fetch_data(this.data_url + "?t=" + new Date().getTime(), use_proxy);
     } else {
       this.raw = JSON.parse(localStorage.getItem("latest"));
       this.high_init();
       this.middle_init();
       this.ok = true;
       if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
-        this.fetch_data(this.data_url + "?t=" + new Date().getTime());
+        this.fetch_data(this.data_url + "?t=" + new Date().getTime(), use_proxy);
       }
     }
     if (localStorage.getItem("filter_history")
@@ -147,10 +148,12 @@ export default {
     }
   },
   methods: {
-    fetch_data: function (url) {
+    fetch_data: function (url, use_proxy) {
+      let new_url
+      use_proxy ? new_url = "https://gh.hbtech.workers.dev/" + url : new_url = url;
       let that = this
       axios
-          .get(url)
+          .get(new_url)
           .then(function (response) {
             let raw = response.data
             let msg
@@ -181,23 +184,27 @@ export default {
               localStorage.setItem("latest", JSON.stringify(raw));
             }
             localStorage.setItem("latest_timestamp", new Date().getTime().toString());
+            localStorage.setItem("use_proxy", use_proxy.toString());
           })
           .catch(function (error) {
             console.log(error)
-            let msg
-            if (that.ok) {
-              msg = "数据更新失败<br>已显示缓存数据"
-              ElNotification.info({
-                message: msg,
-                duration: 2500,
-                position: 'bottom-right',
-                showClose: false,
-                customClass: 'notification-item',
-                dangerouslyUseHTMLString: true,
-              })
+            if (!use_proxy) {
+              that.fetch_data(url, true)
             } else {
-              that.err_msg = error
-              that.err = true
+              if (that.ok) {
+                let msg = "数据更新失败<br>已显示缓存数据"
+                ElNotification.info({
+                  message: msg,
+                  duration: 2500,
+                  position: 'bottom-right',
+                  showClose: false,
+                  customClass: 'notification-item',
+                  dangerouslyUseHTMLString: true,
+                })
+              } else {
+                that.err_msg = error
+                that.err = true
+              }
             }
           })
     },

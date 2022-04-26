@@ -27,7 +27,7 @@ import FooterShow from "@/components/FooterShow";
 import {Head} from '@vueuse/head'
 
 let dev_api_url = "http://localhost/latest.json"
-let prod_api_url = "https://gh.hbtech.workers.dev/https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json"
+let prod_api_url = "https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/latest.json"
 
 export default {
   name: 'App',
