@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Set public path
+        run: echo "VUE_APP_PATH='/COVID-Risk-Region/'" >> .env.production
+
       - name: Build
         run: yarn build
 

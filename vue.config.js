@@ -4,9 +4,7 @@ const {ElementPlusResolver} = require('unplugin-vue-components/resolvers')
 const {defineConfig} = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/COVID-Risk-Region/'
-    : '/',
+  publicPath: process.env.VUE_APP_PATH,
   configureWebpack: {
     resolve: {
       alias: {
