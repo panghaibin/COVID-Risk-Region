@@ -33,6 +33,7 @@
     </h3>
     <el-tree
         v-if="ok"
+        :key="high.key"
         :data="high.tree"
         :props="tree_props"
         node-key="id"
@@ -53,6 +54,7 @@
     </h3>
     <el-tree
         v-if="ok"
+        :key="middle.key"
         :data="middle.tree"
         :props="tree_props"
         node-key="id"
@@ -88,6 +90,7 @@ export default {
       err_msg: "",
 
       high: {
+        key: 0,
         tree: null,
         count: '-',
         province_id_list: [],
@@ -98,6 +101,7 @@ export default {
         expand_all_button: "展开",
       },
       middle: {
+        key: 0,
         tree: null,
         count: '-',
         province_id_list: [],
@@ -317,10 +321,12 @@ export default {
     },
     high_init() {
       this.list2tree(this.raw.data["highlist"], this.high)
+      this.high.key++
       this.high.count = this.raw.data["hcount"]
     },
     middle_init() {
       this.list2tree(this.raw.data["middlelist"], this.middle)
+      this.middle.key++
       this.middle.count = this.raw.data["mcount"]
     },
     high_expand() {
