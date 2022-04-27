@@ -6,7 +6,7 @@
         :disabled="!ok"
         ref="filter_input"
         v-model="filter_text"
-        placeholder="请输入区域名称"
+        placeholder="请输入区域名称，可用空格分隔多个关键词"
         clearable
         @clear="tag_add($refs.filter_input.input.value)"
         @change="tag_add"
