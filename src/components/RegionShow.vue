@@ -151,7 +151,9 @@ export default {
     fetch_data: function (url, use_proxy) {
       let new_url
       let timeout_time
-      use_proxy ? new_url = "https://gh.hbtech.workers.dev/" + url : new_url = url;
+      let proxy_url
+      process.env.NODE_ENV === 'development' ? proxy_url = "" : proxy_url = "https://gh.hbtech.workers.dev/"
+      use_proxy ? new_url = proxy_url + url : new_url = url;
       use_proxy ? timeout_time = 10000 : timeout_time = 3000;
       let CancelToken = axios.CancelToken;
       const source = CancelToken.source();
