@@ -16,14 +16,14 @@ export default {
 
 <style scoped>
 .footer-section {
-  color: #73767a;
+  color: var(--el-color-info-dark-2);
   font-size: var(--el-font-size-small);
   padding-top: 10px;
   padding-bottom: 10px;
 }
 
 .link {
-  color: #73767a;
+  color: var(--el-color-info-dark-2);
   vertical-align: baseline;
   font-size: var(--el-font-size-small);
 }

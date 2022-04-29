@@ -15,6 +15,7 @@
     <div :class="ok ? 'tag-list' : ['tag-list', 'tag-list-disabled']">
       <el-tag
           v-for="(item, index) in filter_history"
+          :type="dark_mode() ? 'info' : ''"
           :key="index"
           :closable="true"
           @close="tag_remove(index)"
@@ -27,7 +28,12 @@
     <h3 class="high-risk">
       高风险等级地区
       <span class="num">({{ high.count }})</span>
-      <el-button ref="high_button" class="expand-all" type="primary" @click="high_expand" :disabled="!ok">
+      <el-button
+          class="expand-all"
+          :type="dark_mode() ? 'info' : 'primary'"
+          @click="high_expand"
+          :disabled="!ok"
+      >
         {{ high.expand_all_button }}
       </el-button>
     </h3>
@@ -48,7 +54,12 @@
     <h3 class="middle-risk">
       中风险等级地区
       <span class="num">({{ middle.count }})</span>
-      <el-button class="expand-all" type="primary" @click="middle_expand" :disabled="!ok">
+      <el-button
+          class="expand-all"
+          :type="dark_mode() ? 'info' : 'primary'"
+          @click="middle_expand"
+          :disabled="!ok"
+      >
         {{ middle.expand_all_button }}
       </el-button>
     </h3>
@@ -152,6 +163,9 @@ export default {
     }
   },
   methods: {
+    dark_mode: () => {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches
+    },
     fetch_data: function (url, use_proxy) {
       let new_url
       let timeout_time

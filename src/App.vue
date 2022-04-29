@@ -67,8 +67,8 @@ html, body {
 }
 
 .header {
-  background-color: #ecf5ff;
-  color: #337ecc;
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary-dark-2);
   height: auto !important;
   text-align: center;
   border-radius: 5px;
@@ -78,5 +78,32 @@ html, body {
   bottom: 0;
   height: auto;
   text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  html, body {
+    background-color: #121212;
+  }
+
+  .header {
+    background-color: #191919;
+    color: #e2e2e2;
+  }
+
+  .el-input__wrapper {
+    background-color: #191919;
+    border-color: #73767a;
+    box-shadow: 0 0 0 1px #73767a;
+  }
+
+  p, h3, .el-input__inner {
+    color: #e2e2e2;
+  }
+
+  .el-tree {
+    --el-tree-node-hover-bg-color: #191919;
+    background-color: #121212;
+    color: #e2e2e2;
+  }
 }
 </style>
