@@ -15,7 +15,7 @@
     <div :class="ok ? 'tag-list' : ['tag-list', 'tag-list-disabled']">
       <el-tag
           v-for="(item, index) in filter_history"
-          :type="dark_mode() ? 'info' : ''"
+          :type="dark_mode ? 'info' : ''"
           :key="index"
           :closable="true"
           @close="tag_remove(index)"
@@ -30,7 +30,7 @@
       <span class="num">({{ high.count }})</span>
       <el-button
           class="expand-all"
-          :type="dark_mode() ? 'info' : 'primary'"
+          :type="dark_mode ? 'info' : 'primary'"
           @click="high_expand"
           :disabled="!ok"
       >
@@ -56,7 +56,7 @@
       <span class="num">({{ middle.count }})</span>
       <el-button
           class="expand-all"
-          :type="dark_mode() ? 'info' : 'primary'"
+          :type="dark_mode ? 'info' : 'primary'"
           @click="middle_expand"
           :disabled="!ok"
       >
@@ -135,6 +135,8 @@ export default {
         "上海",
         "江苏",
       ],
+
+      dark_mode: false,
     }
   },
   mounted() {
@@ -161,11 +163,16 @@ export default {
     } else {
       localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
     }
+
+    let media = window.matchMedia('(prefers-color-scheme: dark)');
+    let that = this;
+    let callback = (e) => {
+      that.dark_mode = e.matches;
+    };
+    media.addEventListener('change', callback);
+    callback(media);
   },
   methods: {
-    dark_mode: () => {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-    },
     fetch_data: function (url, use_proxy) {
       let new_url
       let timeout_time
