@@ -539,4 +539,17 @@ export default {
 .notification-item {
   width: 230px;
 }
+
+@media (prefers-color-scheme: dark) {
+  .notification-item {
+    background-color: #1f1f1f;
+    color: #fff;
+    border-color: #73767a;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
+  }
+
+  .el-skeleton, .el-input.is-disabled {
+    filter: invert(85%);
+  }
+}
 </style>
