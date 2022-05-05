@@ -3,7 +3,7 @@
     <p>
       <span v-if="ok">以下信息截止自 {{ raw.data.end_update_time }}</span>
       <span v-else>加载中……</span>
-      <span v-show="loading_icon"><el-icon class="is-loading"><loading /></el-icon></span>
+      <span v-show="loading_icon"><el-icon class="is-loading"><loading/></el-icon></span>
     </p>
     <el-input
         :disabled="!ok"
@@ -250,8 +250,8 @@ export default {
               }
             }
           }).finally(function () {
-            that.loading_icon = false;
-          })
+        that.loading_icon = false;
+      })
     },
     list2tree(list, data) {
       let tree = []
