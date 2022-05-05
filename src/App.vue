@@ -80,6 +80,12 @@ html, body {
   text-align: center;
 }
 
+@media screen and (max-width: 768px) {
+  .el-scrollbar__bar {
+    display: none;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   html, body {
     background-color: #121212;
