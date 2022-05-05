@@ -1,7 +1,10 @@
 <template>
   <div v-if="!err">
-    <p v-if="ok">以下信息截止自{{ raw.data.end_update_time }}</p>
-    <p v-else>加载中……</p>
+    <p>
+      <span v-if="ok">以下信息截止自 {{ raw.data.end_update_time }}</span>
+      <span v-else>加载中……</span>
+      <span v-show="loading_icon"><el-icon class="is-loading"><loading /></el-icon></span>
+    </p>
     <el-input
         :disabled="!ok"
         ref="filter_input"
@@ -137,6 +140,7 @@ export default {
       ],
 
       dark_mode: false,
+      loading_icon: false,
     }
   },
   mounted() {
@@ -145,6 +149,7 @@ export default {
     }
     let use_proxy = localStorage.getItem("use_proxy") === "true";
     if (!localStorage.getItem("latest_timestamp") || !localStorage.getItem("latest")) {
+      this.loading_icon = true;
       this.fetch_data(this.data_url + "?t=" + new Date().getTime(), use_proxy);
     } else {
       this.raw = JSON.parse(localStorage.getItem("latest"));
@@ -152,6 +157,7 @@ export default {
       this.middle_init();
       this.ok = true;
       if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
+        this.loading_icon = true;
         this.fetch_data(this.data_url + "?t=" + new Date().getTime(), use_proxy);
       }
     }
@@ -243,6 +249,8 @@ export default {
                 that.err = true
               }
             }
+          }).finally(function () {
+            that.loading_icon = false;
           })
     },
     list2tree(list, data) {
@@ -522,6 +530,11 @@ export default {
 * {
   font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
   'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+}
+
+.el-icon.is-loading {
+  animation: rotating 2s linear infinite;
+  vertical-align: text-top;
 }
 
 .el-tree-node__content {

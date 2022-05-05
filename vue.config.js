@@ -2,6 +2,9 @@ const AutoImport = require('unplugin-auto-import/webpack')
 const Components = require('unplugin-vue-components/webpack')
 const {ElementPlusResolver} = require('unplugin-vue-components/resolvers')
 const {defineConfig} = require('@vue/cli-service')
+const IconsResolver = require('unplugin-icons/resolver')
+const Icons = require('unplugin-icons/webpack')
+
 module.exports = defineConfig({
   transpileDependencies: true,
   publicPath: process.env.VUE_APP_PATH,
@@ -13,13 +16,29 @@ module.exports = defineConfig({
     },
     plugins: [
       AutoImport({
-        resolvers: [ElementPlusResolver()],
+        resolvers: [
+          ElementPlusResolver(),
+          IconsResolver({
+            prefix: 'Icon',
+          }),
+        ],
       }),
       Components({
-        resolvers: [ElementPlusResolver()],
+        resolvers: [
+          IconsResolver({
+            enabledCollections: ['ep'],
+          }),
+          ElementPlusResolver(),
+        ],
+      }),
+      Icons({
+        autoInstall: true,
       }),
       require('unplugin-element-plus/webpack')({
         // options
+      }),
+      require('unplugin-icons/webpack')({
+        /* options */
       }),
     ],
   },
