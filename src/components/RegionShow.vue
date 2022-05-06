@@ -15,14 +15,14 @@
         @change="tag_add"
     >
     </el-input>
-    <div :class="ok ? 'tag-list' : ['tag-list', 'tag-list-disabled']">
+    <div :class="ok ? ['tag-list'] : ['tag-list', 'tag-list-disabled']">
       <el-tag
           v-for="(item, index) in filter_history"
           :type="dark_mode ? 'info' : ''"
           :key="index"
           :closable="true"
           @close="tag_remove(index)"
-          @click="$refs.filter_input.focus();filter_text=item;tag_add(item)"
+          @click="filter_text=item;tag_add(item)"
           class="tag-item"
       >
         {{ item }}
