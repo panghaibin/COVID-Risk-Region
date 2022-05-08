@@ -10,7 +10,7 @@
             <h1>{{ title }}</h1>
           </el-header>
           <el-main>
-            <RegionShow :data_url="api_url"></RegionShow>
+            <RegionShow :key="api_url" :data_url="api_url"></RegionShow>
           </el-main>
           <el-footer class="footer">
             <FooterShow></FooterShow>

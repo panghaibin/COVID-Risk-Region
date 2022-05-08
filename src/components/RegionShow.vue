@@ -4,6 +4,12 @@
       <span v-if="ok">以下信息截止自 {{ raw.data.end_update_time }}</span>
       <span v-else>加载中……</span>
       <span v-show="loading_icon"><el-icon class="is-loading"><loading/></el-icon></span>
+      <span class="history-icon">
+        <el-button type="text" >
+          <el-icon><clock/></el-icon>
+          <span class="history-text">历史数据</span>
+        </el-button>
+      </span>
     </p>
     <el-input
         :disabled="!ok"
@@ -156,10 +162,10 @@ export default {
       this.high_init();
       this.middle_init();
       this.ok = true;
-      if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
+      // if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
         this.loading_icon = true;
         this.fetch_data(this.data_url + "?t=" + new Date().getTime(), use_proxy);
-      }
+      // }
     }
     if (localStorage.getItem("filter_history")
         && localStorage.getItem("filter_history") !== ""
@@ -551,6 +557,22 @@ export default {
 
 .notification-item {
   width: 230px;
+}
+
+.history-icon {
+  float: right;
+  vertical-align: text-top;
+}
+
+.history-icon .el-button {
+  padding: 0;
+  height: auto;
+  font-size: 1em;
+}
+
+.history-icon .el-button .history-text{
+  font-size: 0.8em;
+  margin: 0;
 }
 
 @media (prefers-color-scheme: dark) {
