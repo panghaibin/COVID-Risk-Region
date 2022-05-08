@@ -515,9 +515,9 @@ export default {
     get_info() {
       this.info.visible = true
       let that = this
-      axios.get(this.info_url).then(function (response) {
-        that.info.raw = response.data
-        let file_list = response.data["file_list"]
+      this.fetch_data(this.info_url).then((response) => {
+        that.info.raw = response
+        let file_list = response["file_list"]
         let table = []
         for (let i = file_list.length - 1; i >= 0; i--) {
           let item = file_list[i]
@@ -537,7 +537,7 @@ export default {
         }
         that.info.table = table
         that.info.ok = true
-      }).catch(function (error) {
+      }).catch((error) => {
         that.info.err = true
         that.info.err_msg = error
         console.log(error)
