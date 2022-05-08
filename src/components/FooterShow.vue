@@ -27,6 +27,7 @@ export default {
   vertical-align: baseline;
   font-size: var(--el-font-size-small);
 }
+
 .link:hover {
   color: var(--el-link-hover-text-color);
 }

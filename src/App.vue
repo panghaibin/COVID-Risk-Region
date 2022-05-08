@@ -24,7 +24,7 @@
 <script>
 import RegionShow from "@/components/RegionShow";
 import FooterShow from "@/components/FooterShow";
-import {Head} from '@vueuse/head'
+import { Head } from '@vueuse/head'
 import update from './mixins/update'
 
 let dev_api_url = "http://localhost/latest.json"

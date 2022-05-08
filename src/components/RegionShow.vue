@@ -89,7 +89,7 @@
 
 <script>
 import axios from "axios"
-import {ElNotification} from 'element-plus'
+import { ElNotification } from 'element-plus'
 
 export default {
   name: "RegionShow",
