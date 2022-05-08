@@ -10,7 +10,7 @@
             <h1>{{ title }}</h1>
           </el-header>
           <el-main>
-            <RegionShow :key="api_url" :data_url="api_url"></RegionShow>
+            <RegionShow :key="api_url" :data_url="api_url" :info_url="info_url"></RegionShow>
           </el-main>
           <el-footer class="footer">
             <FooterShow></FooterShow>
@@ -27,6 +27,11 @@ import FooterShow from "@/components/FooterShow";
 import { Head } from '@vueuse/head'
 import update from '@/mixins/update'
 
+let url = process.env.NODE_ENV === 'development'
+    // ? 'https://raw.githubusercontents.com/panghaibin/RiskLevelAPI/api/'
+    ? 'http://localhost/ccr-api/'
+    : 'https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/';
+
 export default {
   name: "HomeView",
   components: {
@@ -36,9 +41,6 @@ export default {
   },
   computed: {
     api_url() {
-      let url = process.env.NODE_ENV === 'development'
-          ? 'http://localhost/ccr-api/'
-          : 'https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/';
       let file_name = this.$route.params.fileName;
       if (file_name) {
         return url + file_name + '.json';
@@ -50,6 +52,7 @@ export default {
   data() {
     return {
       title: "全国疫情中高风险地区查询",
+      info_url: url + 'info.json'
     };
   },
   mixins: [update],

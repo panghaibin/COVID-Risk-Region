@@ -4,13 +4,24 @@
       <span v-if="ok">以下信息截止自 {{ raw.data.end_update_time }}</span>
       <span v-else>加载中……</span>
       <span v-show="loading_icon"><el-icon class="is-loading"><loading/></el-icon></span>
-      <span class="history-icon">
-        <el-button type="text" >
+      <span v-if="ok && !loading_icon" class="history-icon">
+        <el-button type="text" @click="get_info">
           <el-icon><clock/></el-icon>
           <span class="history-text">历史数据</span>
         </el-button>
       </span>
     </p>
+    <el-dialog v-model="info.visible" title="历史数据" :fullscreen="true">
+      <el-table :data="info.table">
+        <el-table-column v-if="info.ok" property="update_time" label="时间"/>
+        <el-table-column v-else label="加载中……"/>
+      </el-table>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="info.visible = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
     <el-input
         :disabled="!ok"
         ref="filter_input"
@@ -100,7 +111,8 @@ import { ElNotification } from 'element-plus'
 export default {
   name: "RegionShow",
   props: {
-    data_url: String
+    data_url: String,
+    info_url: String,
   },
   data() {
     return {
@@ -108,6 +120,15 @@ export default {
       ok: false,
       err: false,
       err_msg: "",
+
+      info: {
+        raw: null,
+        visible: false,
+        ok: false,
+        err: false,
+        err_msg: "",
+        table: null,
+      },
 
       high: {
         key: 0,
@@ -163,8 +184,8 @@ export default {
       this.middle_init();
       this.ok = true;
       // if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
-        this.loading_icon = true;
-        this.fetch_data(this.data_url + "?t=" + new Date().getTime(), use_proxy);
+      this.loading_icon = true;
+      this.fetch_data(this.data_url + "?t=" + new Date().getTime(), use_proxy);
       // }
     }
     if (localStorage.getItem("filter_history")
@@ -200,7 +221,7 @@ export default {
 
       let that = this
       axios
-          .get(new_url, {cancelToken: source.token})
+          .get(new_url, { cancelToken: source.token })
           .then(function (response) {
             clearTimeout(timeout);
             let raw = response.data
@@ -474,6 +495,37 @@ export default {
       this.filter_history.splice(index, 1)
       localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
     },
+    get_info() {
+      this.info.visible = true
+      let that = this
+      axios.get(this.info_url).then(function (response) {
+        that.info.raw = response.data
+        let file_list = response.data["file_list"]
+        let table = []
+        for (let i = file_list.length - 1; i >= 0; i--) {
+          let item = file_list[i]
+          let update_timestamp = new Date(item["update_time"] * 1000)
+          let update_time = update_timestamp.toLocaleString('zh-CN',
+              {
+                timeZone: 'Asia/Shanghai',
+                hour12: false,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+              })
+          update_time = update_time.replace(/\//g, "-").replace(":00:00", "时")
+          item["update_time"] = update_time
+          table.push(item)
+        }
+        that.info.table = table
+        that.info.ok = true
+      }).catch(function (error) {
+        that.info.err = true
+        that.info.err_msg = error
+        console.log(error)
+      })
+    },
   },
   watch: {
     filter_text(value) {
@@ -531,6 +583,21 @@ export default {
   opacity: 0.5;
   pointer-events: none;
 }
+
+.dialog-footer {
+  width: 100%;
+  position: fixed;
+  z-index: 9999;
+  bottom: 0;
+  right: 10px;
+  background-color: white;
+}
+
+.dialog-footer button:first-child {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  margin-top: 6px;
+}
 </style>
 <style>
 * {
@@ -570,7 +637,7 @@ export default {
   font-size: 1em;
 }
 
-.history-icon .el-button .history-text{
+.history-icon .el-button .history-text {
   font-size: 0.8em;
   margin: 0;
 }
