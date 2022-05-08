@@ -176,16 +176,16 @@ export default {
     }
     if (!localStorage.getItem("latest_timestamp") || !localStorage.getItem("latest")) {
       this.loading_icon = true;
-      this.fetch_data(this.data_url + "?t=" + new Date().getTime());
+      this.fetch_api();
     } else {
       this.raw = JSON.parse(localStorage.getItem("latest"));
       this.high_init();
       this.middle_init();
       this.ok = true;
-      // if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
-      this.loading_icon = true;
-      this.fetch_data(this.data_url + "?t=" + new Date().getTime());
-      // }
+      if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
+        this.loading_icon = true;
+        this.fetch_api();
+      }
     }
     if (localStorage.getItem("filter_history")
         && localStorage.getItem("filter_history") !== ""
@@ -205,17 +205,22 @@ export default {
     callback(media);
   },
   methods: {
-    fetch_data: function (url, use_proxy = null) {
+    fetch_data: async function (url, use_proxy = null, force_fetch = false) {
+      let name = url.split("/").pop().split(".").shift();
+      let name_timestamp = name + "_timestamp";
+      if (!force_fetch && new Date().getTime() - localStorage.getItem(name_timestamp) < 5 * 60 * 1000) {
+        return Promise.resolve(JSON.parse(localStorage.getItem(name)));
+      }
+
       if (use_proxy === null) {
         use_proxy = localStorage.getItem("use_proxy") === "true";
       }
-      let name = url.split("/").pop().split(".").shift();
       let new_url
       let timeout_time
       let proxy_url
       process.env.NODE_ENV === 'development' ? proxy_url = "" : proxy_url = "https://gh.hbtech.workers.dev/"
       use_proxy ? new_url = proxy_url + url : new_url = url;
-      use_proxy ? timeout_time = 5000 : timeout_time = 1000;
+      use_proxy ? timeout_time = 3000 : timeout_time = 1000;
 
       let CancelToken = axios.CancelToken;
       const source = CancelToken.source();
@@ -224,65 +229,74 @@ export default {
       }, timeout_time);
 
       let that = this
-      axios
-          .get(new_url, { cancelToken: source.token })
-          .then(function (response) {
-            clearTimeout(timeout);
-            let raw = response.data
-            let msg
-            let update_required = false
-            if (that.ok) {
-              if (that.raw.data["end_update_time"] !== raw.data["end_update_time"]) {
-                msg = "数据更新成功"
-                update_required = true
-              } else {
-                msg = "已是最新数据"
-              }
-            } else {
-              msg = "数据加载成功"
-              update_required = true
-            }
-            ElNotification.success({
-              message: msg,
-              duration: 2500,
-              position: 'bottom-right',
-              showClose: false,
-              customClass: 'notification-item',
-            })
-            if (update_required) {
-              that.raw = raw
-              that.high_init()
-              that.middle_init()
-              that.ok = true
-              localStorage.setItem(name, JSON.stringify(raw));
-            }
-            localStorage.setItem(name + "_timestamp", new Date().getTime().toString());
-            localStorage.setItem("use_proxy", use_proxy.toString());
-            that.loading_icon = false;
+      try {
+        let res = await axios.get(new_url, { cancelToken: source.token })
+        clearTimeout(timeout);
+        let raw = res.data;
+        localStorage.setItem(name, JSON.stringify(raw));
+        localStorage.setItem(name_timestamp, new Date().getTime().toString());
+        localStorage.setItem("use_proxy", use_proxy.toString());
+        return Promise.resolve(raw);
+      } catch (error) {
+        clearTimeout(timeout);
+        console.log(error)
+        if (!use_proxy) {
+          return that.fetch_data(url, true)
+        } else {
+          return Promise.reject(error);
+        }
+      }
+    },
+    fetch_api() {
+      let url = this.data_url + "?t=" + new Date().getTime();
+      this.fetch_data(url, null, true).then((data) => {
+        let raw = data
+        let msg
+        let update_required = false
+        if (this.ok) {
+          if (this.raw.data["end_update_time"] !== raw["data"]["end_update_time"]) {
+            msg = "数据更新成功"
+            update_required = true
+          } else {
+            msg = "已是最新数据"
+          }
+        } else {
+          msg = "数据加载成功"
+          update_required = true
+        }
+        ElNotification.success({
+          message: msg,
+          duration: 2500,
+          position: 'bottom-right',
+          showClose: false,
+          customClass: 'notification-item',
+        })
+        if (update_required) {
+          this.raw = raw
+          this.high_init()
+          this.middle_init()
+          this.ok = true
+        }
+        this.loading_icon = false;
+      }).catch((error) => {
+        console.log(3)
+        console.log(error)
+        if (this.ok) {
+          let msg = "数据更新失败<br>已显示缓存数据"
+          ElNotification.info({
+            message: msg,
+            duration: 2500,
+            position: 'bottom-right',
+            showClose: false,
+            customClass: 'notification-item',
+            dangerouslyUseHTMLString: true,
           })
-          .catch(function (error) {
-            clearTimeout(timeout);
-            console.log(error)
-            if (!use_proxy) {
-              that.fetch_data(url, true)
-            } else {
-              if (that.ok) {
-                let msg = "数据更新失败<br>已显示缓存数据"
-                ElNotification.info({
-                  message: msg,
-                  duration: 2500,
-                  position: 'bottom-right',
-                  showClose: false,
-                  customClass: 'notification-item',
-                  dangerouslyUseHTMLString: true,
-                })
-              } else {
-                that.err_msg = error
-                that.err = true
-              }
-              that.loading_icon = false;
-            }
-          })
+        } else {
+          this.err_msg = error
+          this.err = true
+        }
+        this.loading_icon = false;
+      })
     },
     list2tree(list, data) {
       let tree = []
