@@ -30,7 +30,7 @@ import update from '@/mixins/update'
 let url = process.env.NODE_ENV === 'development'
     // ? 'https://raw.githubusercontents.com/panghaibin/RiskLevelAPI/api/'
     ? 'http://localhost/ccr-api/'
-    : 'https://raw.githubusercontent.com/panghaibin/RiskLevelAPI/api/';
+    : 'https://covid-api.caduo.ml/';
 
 export default {
   name: "HomeView",

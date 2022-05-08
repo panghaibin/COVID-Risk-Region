@@ -218,7 +218,9 @@ export default {
       let new_url
       let timeout_time
       let proxy_url
-      process.env.NODE_ENV === 'development' ? proxy_url = "" : proxy_url = "https://gh.hbtech.workers.dev/"
+      // disabled proxy temporarily due to the fxxking gfw
+      // process.env.NODE_ENV === 'development' ? proxy_url = "" : proxy_url = "https://gh.hbtech.workers.dev/"
+      proxy_url = ""
       use_proxy ? new_url = proxy_url + url : new_url = url;
       use_proxy ? timeout_time = 3000 : timeout_time = 1000;
 
@@ -279,7 +281,6 @@ export default {
         }
         this.loading_icon = false;
       }).catch((error) => {
-        console.log(3)
         console.log(error)
         if (this.ok) {
           let msg = "数据更新失败<br>已显示缓存数据"
