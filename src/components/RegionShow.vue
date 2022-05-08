@@ -187,11 +187,9 @@ export default {
         this.fetch_api();
       }
     }
-    if (localStorage.getItem("filter_history")
-        && localStorage.getItem("filter_history") !== ""
-        && localStorage.getItem("filter_history") !== "[]"
-    ) {
-      this.filter_history = JSON.parse(localStorage.getItem("filter_history"));
+    let filter_history = JSON.parse(localStorage.getItem("filter_history"));
+    if (filter_history && filter_history.length) {
+      this.filter_history = filter_history
     } else {
       localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
     }
