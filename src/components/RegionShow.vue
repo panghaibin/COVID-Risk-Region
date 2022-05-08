@@ -174,10 +174,9 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       window.vue = this;
     }
-    let use_proxy = localStorage.getItem("use_proxy") === "true";
     if (!localStorage.getItem("latest_timestamp") || !localStorage.getItem("latest")) {
       this.loading_icon = true;
-      this.fetch_data(this.data_url + "?t=" + new Date().getTime(), use_proxy);
+      this.fetch_data(this.data_url + "?t=" + new Date().getTime());
     } else {
       this.raw = JSON.parse(localStorage.getItem("latest"));
       this.high_init();
@@ -185,7 +184,7 @@ export default {
       this.ok = true;
       // if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
       this.loading_icon = true;
-      this.fetch_data(this.data_url + "?t=" + new Date().getTime(), use_proxy);
+      this.fetch_data(this.data_url + "?t=" + new Date().getTime());
       // }
     }
     if (localStorage.getItem("filter_history")
@@ -206,13 +205,18 @@ export default {
     callback(media);
   },
   methods: {
-    fetch_data: function (url, use_proxy) {
+    fetch_data: function (url, use_proxy = null) {
+      if (use_proxy === null) {
+        use_proxy = localStorage.getItem("use_proxy") === "true";
+      }
+      let name = url.split("/").pop().split(".").shift();
       let new_url
       let timeout_time
       let proxy_url
       process.env.NODE_ENV === 'development' ? proxy_url = "" : proxy_url = "https://gh.hbtech.workers.dev/"
       use_proxy ? new_url = proxy_url + url : new_url = url;
-      use_proxy ? timeout_time = 10000 : timeout_time = 3000;
+      use_proxy ? timeout_time = 5000 : timeout_time = 1000;
+
       let CancelToken = axios.CancelToken;
       const source = CancelToken.source();
       const timeout = setTimeout(() => {
@@ -250,10 +254,11 @@ export default {
               that.high_init()
               that.middle_init()
               that.ok = true
-              localStorage.setItem("latest", JSON.stringify(raw));
+              localStorage.setItem(name, JSON.stringify(raw));
             }
-            localStorage.setItem("latest_timestamp", new Date().getTime().toString());
+            localStorage.setItem(name + "_timestamp", new Date().getTime().toString());
             localStorage.setItem("use_proxy", use_proxy.toString());
+            that.loading_icon = false;
           })
           .catch(function (error) {
             clearTimeout(timeout);
@@ -275,10 +280,9 @@ export default {
                 that.err_msg = error
                 that.err = true
               }
+              that.loading_icon = false;
             }
-          }).finally(function () {
-        that.loading_icon = false;
-      })
+          })
     },
     list2tree(list, data) {
       let tree = []
