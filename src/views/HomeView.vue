@@ -7,7 +7,9 @@
       <div class="content">
         <el-container>
           <el-header class="header">
-            <h1>{{ title }}</h1>
+            <router-link to="/">
+              <h1>{{ title }}</h1>
+            </router-link>
           </el-header>
           <el-main>
             <RegionShow
@@ -75,6 +77,11 @@ html, body {
 
 .content-body {
   margin: 8px;
+}
+
+header a {
+  text-decoration:none;
+  color: inherit;
 }
 
 .content {

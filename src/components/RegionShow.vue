@@ -24,7 +24,11 @@
       <el-table :data="info.table" empty-text="数据加载中……">
         <el-table-column label="时间">
           <template #default="scope">
-            <router-link :to="scope.row.file_name">{{ scope.row.update_time }}</router-link>
+            <router-link :to="scope.row.file_name" class="history-link">
+              <div class="history-item">
+                {{ scope.row.update_time }}
+              </div>
+            </router-link>
           </template>
         </el-table-column>
       </el-table>
@@ -721,6 +725,19 @@ export default {
 .history-icon .el-button .history-text {
   font-size: 0.8em;
   margin: 0;
+}
+
+.history-link {
+  text-decoration:none;
+  color: inherit;
+}
+
+.history-item {
+  padding: 0;
+  margin: 0;
+  border: none;
+  width: 100%;
+  height: auto;
 }
 
 @media (prefers-color-scheme: dark) {
