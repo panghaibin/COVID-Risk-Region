@@ -333,6 +333,64 @@ export default {
         this.loading_icon = false;
       })
     },
+    fetch_info() {
+      this.info.visible = true
+      let that = this
+      this.fetch_data(this.info_url).then((response) => {
+        that.info.raw = response
+        let file_list = response["file_list"]
+        let table = []
+        let id_count = 0
+        for (let i = file_list.length - 1; i >= 0; i--) {
+          let item = file_list[i]
+          let update_timestamp = new Date(item["update_time"] * 1000)
+          let day = update_timestamp.toLocaleString('zh-CN',
+              {
+                timeZone: 'Asia/Shanghai',
+                hour12: false,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              })
+          let update_time = update_timestamp.toLocaleString('zh-CN',
+              {
+                timeZone: 'Asia/Shanghai',
+                hour12: false,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+              })
+          day = day.replace(/\//g, "-")
+          update_time = update_time.replace(/\//g, "-").replace(":00:00", "时")
+          let file = item["file_name"].replace(".json", "")
+          if (!table.length || table[table.length - 1]['update_time'] !== day) {
+            table.push({
+              id: id_count++,
+              update_time: day,
+              file_name: "#",
+              children: [{
+                id: id_count++,
+                update_time: update_time,
+                file_name: file,
+              }]
+            })
+          } else {
+            table[table.length - 1]['children'].push({
+              id: id_count++,
+              update_time: update_time,
+              file_name: file,
+            })
+          }
+        }
+        that.info.table = table
+        that.info.ok = true
+      }).catch((error) => {
+        that.info.err = true
+        that.info.err_msg = error
+        console.log(error)
+      })
+    },
     fetch_history() {
       this.loading_icon = true;
       let url = this.data_url;
@@ -579,64 +637,6 @@ export default {
     tag_remove(index) {
       this.filter_history.splice(index, 1)
       localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
-    },
-    fetch_info() {
-      this.info.visible = true
-      let that = this
-      this.fetch_data(this.info_url).then((response) => {
-        that.info.raw = response
-        let file_list = response["file_list"]
-        let table = []
-        let id_count = 0
-        for (let i = file_list.length - 1; i >= 0; i--) {
-          let item = file_list[i]
-          let update_timestamp = new Date(item["update_time"] * 1000)
-          let day = update_timestamp.toLocaleString('zh-CN',
-              {
-                timeZone: 'Asia/Shanghai',
-                hour12: false,
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              })
-          let update_time = update_timestamp.toLocaleString('zh-CN',
-              {
-                timeZone: 'Asia/Shanghai',
-                hour12: false,
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-              })
-          day = day.replace(/\//g, "-")
-          update_time = update_time.replace(/\//g, "-").replace(":00:00", "时")
-          let file = item["file_name"].replace(".json", "")
-          if (!table.length || table[table.length - 1]['update_time'] !== day) {
-            table.push({
-              id: id_count++,
-              update_time: day,
-              file_name: "#",
-              children: [{
-                id: id_count++,
-                update_time: update_time,
-                file_name: file,
-              }]
-            })
-          } else {
-            table[table.length - 1]['children'].push({
-              id: id_count++,
-              update_time: update_time,
-              file_name: file,
-            })
-          }
-        }
-        that.info.table = table
-        that.info.ok = true
-      }).catch((error) => {
-        that.info.err = true
-        that.info.err_msg = error
-        console.log(error)
-      })
     },
     info_click(row) {
       if (row.file_name === "#") {
