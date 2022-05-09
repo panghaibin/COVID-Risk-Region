@@ -22,6 +22,7 @@
     </p>
     <el-dialog v-model="info.visible" title="历史数据" width="320px">
       <el-table
+          v-if="!info.err"
           :data="info.table"
           ref="info_table"
           row-key="id"
@@ -35,6 +36,10 @@
           </template>
         </el-table-column>
       </el-table>
+      <div v-else>
+        <p>加载历史记录失败！请刷新重试</p>
+        <p>{{ info.err_msg }}</p>
+      </div>
       <template #footer>
         <el-button @click="info.visible = false">关闭</el-button>
       </template>
@@ -338,6 +343,7 @@ export default {
     },
     fetch_info() {
       this.info.visible = true
+      this.info.err = false
       let that = this
       this.fetch_data(this.info_url).then((response) => {
         that.info.raw = response
