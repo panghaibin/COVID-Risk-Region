@@ -379,7 +379,7 @@ export default {
               }]
             })
           } else {
-            table[table.length - 1]['children'].push({
+            table[table.length - 1]['children'].unshift({
               id: id_count++,
               update_time: update_time,
               file_name: file,
