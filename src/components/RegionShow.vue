@@ -227,11 +227,14 @@ export default {
     callback(media);
   },
   methods: {
-    fetch_data: async function (url, use_proxy = null, force_local = false) {
+    fetch_data: async function (url, use_proxy = null, force_local = false, force_fetch = false) {
       let name = url.split("/").pop().split(".").shift();
       let name_timestamp = name + "_timestamp";
       let name_local = JSON.parse(localStorage.getItem(name));
       if (force_local && !!name_local) {
+        return name_local;
+      }
+      if (!force_fetch && new Date().getTime() - localStorage.getItem(name_timestamp) < 5 * 60 * 1000) {
         return name_local;
       }
 
@@ -287,7 +290,7 @@ export default {
         this.loading_icon = true;
       }
       let url = this.data_url + "?t=" + new Date().getTime();
-      this.fetch_data(url, null, false).then((data) => {
+      this.fetch_data(url, null, false, true).then((data) => {
         let msg
         let update_required = true
         if (this.ok) {
