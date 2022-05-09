@@ -10,7 +10,12 @@
             <h1>{{ title }}</h1>
           </el-header>
           <el-main>
-            <RegionShow :key="api_url" :data_url="api_url" :info_url="info_url"></RegionShow>
+            <RegionShow
+                :key="api_url"
+                :data_url="api_url"
+                :info_url="info_url"
+                :type_latest="type_latest"
+            ></RegionShow>
           </el-main>
           <el-footer class="footer">
             <FooterShow></FooterShow>
@@ -28,7 +33,7 @@ import { Head } from '@vueuse/head'
 import update from '@/mixins/update'
 
 let url = process.env.NODE_ENV === 'development'
-    // ? 'https://raw.githubusercontents.com/panghaibin/RiskLevelAPI/api/'
+    // ? 'https://covid-api.caduo.ml/'
     ? 'http://localhost/ccr-api/'
     : 'https://covid-api.caduo.ml/';
 
@@ -47,7 +52,10 @@ export default {
       } else {
         return url + 'latest.json';
       }
-    }
+    },
+    type_latest() {
+      return !this.$route.params.fileName;
+    },
   },
   data() {
     return {

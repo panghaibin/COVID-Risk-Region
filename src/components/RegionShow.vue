@@ -1,11 +1,20 @@
 <template>
   <div v-if="!err">
     <p>
-      <span v-if="ok">以下信息截止自 {{ raw.data.end_update_time }}</span>
-      <span v-else>加载中……</span>
+      <template v-if="ok">
+        <span v-if="type_latest">
+          以下数据截止自 {{ raw.data.end_update_time }}
+        </span>
+        <span v-else>
+          历史数据截止自 {{ raw.data.end_update_time }}
+        </span>
+      </template>
+      <template v-else>
+        <span>加载中……</span>
+      </template>
       <span v-show="loading_icon"><el-icon class="is-loading"><loading/></el-icon></span>
       <span v-if="ok && !loading_icon" class="history-icon">
-        <el-button type="text" @click="get_info">
+        <el-button type="text" @click="fetch_info">
           <el-icon><clock/></el-icon>
           <span class="history-text">历史数据</span>
         </el-button>
@@ -116,6 +125,15 @@ export default {
   props: {
     data_url: String,
     info_url: String,
+    type_latest: Boolean,
+  },
+  computed: {
+    data_name() {
+      return this.data_url.split("/").pop().split(".").shift();
+    },
+    data_name_timestamp() {
+      return this.data_name + "_timestamp";
+    },
   },
   data() {
     return {
@@ -177,19 +195,17 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       window.vue = this;
     }
-    if (!localStorage.getItem("latest_timestamp") || !localStorage.getItem("latest")) {
-      this.loading_icon = true;
-      this.fetch_api();
-    } else {
-      this.raw = JSON.parse(localStorage.getItem("latest"));
-      this.high_init();
-      this.middle_init();
-      this.ok = true;
-      if ((new Date().getTime() - localStorage.getItem("latest_timestamp")) > 5 * 60 * 1000) {
-        this.loading_icon = true;
-        this.fetch_api();
+
+    if (this.type_latest) {
+      if (!localStorage.getItem(this.data_name_timestamp) || !localStorage.getItem(this.data_name)) {
+        this.fetch_latest(false);
+      } else {
+        this.fetch_latest(true);
       }
+    } else {
+      this.fetch_history();
     }
+
     let filter_history = JSON.parse(localStorage.getItem("filter_history"));
     if (filter_history && filter_history.length) {
       this.filter_history = filter_history
@@ -206,11 +222,12 @@ export default {
     callback(media);
   },
   methods: {
-    fetch_data: async function (url, use_proxy = null, force_fetch = false) {
+    fetch_data: async function (url, use_proxy = null, force_local = false) {
       let name = url.split("/").pop().split(".").shift();
       let name_timestamp = name + "_timestamp";
-      if (!force_fetch && new Date().getTime() - localStorage.getItem(name_timestamp) < 5 * 60 * 1000) {
-        return Promise.resolve(JSON.parse(localStorage.getItem(name)));
+      let name_local = JSON.parse(localStorage.getItem(name));
+      if (force_local && !!name_local) {
+        return name_local;
       }
 
       if (use_proxy === null) {
@@ -223,7 +240,7 @@ export default {
       // process.env.NODE_ENV === 'development' ? proxy_url = "" : proxy_url = "https://gh.hbtech.workers.dev/"
       proxy_url = ""
       use_proxy ? new_url = proxy_url + url : new_url = url;
-      use_proxy ? timeout_time = 3000 : timeout_time = 1000;
+      use_proxy ? timeout_time = 5000 : timeout_time = 2000;
 
       let CancelToken = axios.CancelToken;
       const source = CancelToken.source();
@@ -250,22 +267,33 @@ export default {
         }
       }
     },
-    fetch_api() {
+    fetch_latest(check_local = false) {
+      if (check_local) {
+        this.raw = JSON.parse(localStorage.getItem(this.data_name));
+        this.high_init();
+        this.middle_init();
+        this.ok = true;
+        if ((new Date().getTime() - localStorage.getItem(this.data_name_timestamp)) < 5 * 60 * 1000) {
+          return
+        } else {
+          this.loading_icon = true;
+        }
+      } else {
+        this.loading_icon = true;
+      }
       let url = this.data_url + "?t=" + new Date().getTime();
-      this.fetch_data(url, null, true).then((data) => {
-        let raw = data
+      this.fetch_data(url, null, false).then((data) => {
         let msg
-        let update_required = false
+        let update_required = true
         if (this.ok) {
-          if (this.raw.data["end_update_time"] !== raw["data"]["end_update_time"]) {
+          if (this.raw.data["end_update_time"] !== data["data"]["end_update_time"]) {
             msg = "数据更新成功"
-            update_required = true
           } else {
             msg = "已是最新数据"
+            update_required = false
           }
         } else {
           msg = "数据加载成功"
-          update_required = true
         }
         ElNotification.success({
           message: msg,
@@ -275,7 +303,7 @@ export default {
           customClass: 'notification-item',
         })
         if (update_required) {
-          this.raw = raw
+          this.raw = data
           this.high_init()
           this.middle_init()
           this.ok = true
@@ -297,6 +325,38 @@ export default {
           this.err_msg = error
           this.err = true
         }
+        this.loading_icon = false;
+      })
+    },
+    fetch_history() {
+      this.loading_icon = true;
+      let url = this.data_url;
+      this.fetch_data(url, null, true).then((data) => {
+        let msg = "历史数据加载成功"
+        ElNotification.success({
+          message: msg,
+          duration: 2500,
+          position: 'bottom-right',
+          showClose: false,
+          customClass: 'notification-item',
+        })
+        this.raw = data
+        this.high_init()
+        this.middle_init()
+        this.ok = true
+        this.loading_icon = false;
+      }).catch((error) => {
+        console.log(error)
+        let msg = "历史数据加载失败"
+        ElNotification.info({
+          message: msg,
+          duration: 2500,
+          position: 'bottom-right',
+          showClose: false,
+          customClass: 'notification-item',
+        })
+        this.err_msg = error
+        this.err = true
         this.loading_icon = false;
       })
     },
@@ -515,7 +575,7 @@ export default {
       this.filter_history.splice(index, 1)
       localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
     },
-    get_info() {
+    fetch_info() {
       this.info.visible = true
       let that = this
       this.fetch_data(this.info_url).then((response) => {
