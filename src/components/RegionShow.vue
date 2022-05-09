@@ -6,7 +6,7 @@
           以下数据截止自 {{ raw.data.end_update_time }}
         </span>
         <span v-else>
-          历史数据截止自 {{ raw.data.end_update_time }}
+          历史数据 {{ raw.data.end_update_time }}
         </span>
       </template>
       <template v-else>
@@ -16,19 +16,22 @@
       <span v-if="ok && !loading_icon" class="history-icon">
         <el-button type="text" @click="fetch_info">
           <el-icon><clock/></el-icon>
-          <span class="history-text">历史数据</span>
+          <span class="history-text">查看历史</span>
         </el-button>
       </span>
     </p>
     <el-dialog v-model="info.visible" title="历史数据" width="320px">
-      <el-table :data="info.table" empty-text="数据加载中……" height="50vh">
+      <el-table
+          :data="info.table"
+          ref="info_table"
+          row-key="id"
+          @cell-click="info_click"
+          empty-text="数据加载中……"
+          height="50vh"
+      >
         <el-table-column label="时间">
           <template #default="scope">
-            <router-link :to="scope.row.file_name" class="history-link">
-              <div class="history-item">
-                {{ scope.row.update_time }}
-              </div>
-            </router-link>
+            {{ scope.row.update_time }}
           </template>
         </el-table-column>
       </el-table>
@@ -584,9 +587,18 @@ export default {
         that.info.raw = response
         let file_list = response["file_list"]
         let table = []
+        let id_count = 0
         for (let i = file_list.length - 1; i >= 0; i--) {
           let item = file_list[i]
           let update_timestamp = new Date(item["update_time"] * 1000)
+          let day = update_timestamp.toLocaleString('zh-CN',
+              {
+                timeZone: 'Asia/Shanghai',
+                hour12: false,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              })
           let update_time = update_timestamp.toLocaleString('zh-CN',
               {
                 timeZone: 'Asia/Shanghai',
@@ -596,10 +608,27 @@ export default {
                 day: '2-digit',
                 hour: '2-digit',
               })
+          day = day.replace(/\//g, "-")
           update_time = update_time.replace(/\//g, "-").replace(":00:00", "时")
-          item["update_time"] = update_time
-          item["file_name"] = item["file_name"].replace(".json", "")
-          table.push(item)
+          let file = item["file_name"].replace(".json", "")
+          if (!table.length || table[table.length - 1]['update_time'] !== day) {
+            table.push({
+              id: id_count++,
+              update_time: day,
+              file_name: "#",
+              children: [{
+                id: id_count++,
+                update_time: update_time,
+                file_name: file,
+              }]
+            })
+          } else {
+            table[table.length - 1]['children'].push({
+              id: id_count++,
+              update_time: update_time,
+              file_name: file,
+            })
+          }
         }
         that.info.table = table
         that.info.ok = true
@@ -608,6 +637,15 @@ export default {
         that.info.err_msg = error
         console.log(error)
       })
+    },
+    info_click(row) {
+      if (row.file_name === "#") {
+        this.$refs.info_table.toggleRowExpansion(row)
+      } else {
+        this.$router.push({
+          path: "./" + row.file_name,
+        })
+      }
     },
   },
   watch: {
@@ -709,19 +747,6 @@ export default {
 .history-icon .el-button .history-text {
   font-size: 0.8em;
   margin: 0;
-}
-
-.history-link {
-  text-decoration: none;
-  color: inherit;
-}
-
-.history-item {
-  padding: 0;
-  margin: 0;
-  border: none;
-  width: 100%;
-  height: auto;
 }
 
 @media (prefers-color-scheme: dark) {
