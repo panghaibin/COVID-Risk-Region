@@ -356,7 +356,6 @@ export default {
           let day = update_timestamp.toLocaleString('zh-CN',
               {
                 timeZone: 'Asia/Shanghai',
-                hour12: false,
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
@@ -365,13 +364,10 @@ export default {
               {
                 timeZone: 'Asia/Shanghai',
                 hour12: false,
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
                 hour: '2-digit',
               })
           day = day.replace(/\//g, "-")
-          update_time = update_time.replace(/\//g, "-")
+          update_time = update_time.replace("24", "00")
           let file = item["file_name"].replace(".json", "")
           if (!table.length || table[table.length - 1]['update_time'] !== day) {
             table.push({
@@ -380,14 +376,14 @@ export default {
               file_name: "#",
               children: [{
                 id: id_count++,
-                update_time: update_time,
+                update_time: day + " " + update_time,
                 file_name: file,
               }]
             })
           } else {
             table[table.length - 1]['children'].unshift({
               id: id_count++,
-              update_time: update_time,
+              update_time: day + " " + update_time,
               file_name: file,
             })
           }
