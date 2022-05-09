@@ -20,8 +20,8 @@
         </el-button>
       </span>
     </p>
-    <el-dialog v-model="info.visible" title="历史数据" :fullscreen="true">
-      <el-table :data="info.table" empty-text="数据加载中……">
+    <el-dialog v-model="info.visible" title="历史数据" width="320px">
+      <el-table :data="info.table" empty-text="数据加载中……" height="50vh">
         <el-table-column label="时间">
           <template #default="scope">
             <router-link :to="scope.row.file_name" class="history-link">
@@ -33,9 +33,7 @@
         </el-table-column>
       </el-table>
       <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="info.visible = false">关闭</el-button>
-        </div>
+        <el-button @click="info.visible = false">关闭</el-button>
       </template>
     </el-dialog>
     <el-input
@@ -669,20 +667,6 @@ export default {
   pointer-events: none;
 }
 
-.dialog-footer {
-  width: 100%;
-  position: fixed;
-  z-index: 9999;
-  bottom: 0;
-  right: 10px;
-  background-color: white;
-}
-
-.dialog-footer button:first-child {
-  margin-right: 10px;
-  margin-bottom: 10px;
-  margin-top: 6px;
-}
 </style>
 <style>
 * {
@@ -728,7 +712,7 @@ export default {
 }
 
 .history-link {
-  text-decoration:none;
+  text-decoration: none;
   color: inherit;
 }
 
