@@ -758,6 +758,10 @@ export default {
   margin: 0;
 }
 
+.el-dialog__body {
+  padding: 10px;
+}
+
 @media (prefers-color-scheme: dark) {
   .notification-item {
     background-color: #1f1f1f;
