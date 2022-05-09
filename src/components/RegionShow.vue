@@ -773,5 +773,33 @@ export default {
   .el-skeleton, .el-input.is-disabled {
     filter: invert(85%);
   }
+
+  .el-overlay {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .el-dialog {
+    background-color: #191919;
+  }
+
+  .el-dialog__title {
+    color: #fff;
+  }
+
+  tr, td, th {
+    background-color: #191919 !important;
+    border-color: #73767a;
+    border-bottom: 1px solid #73767a !important;
+    color: #ffffff;
+  }
+
+  tr:hover, td:hover, th:hover {
+    background-color: #1f1f1f !important;
+  }
+
+  .el-table {
+    --el-table-border-color: #73767a !important;
+    --el-table-bg-color: #191919 !important;
+  }
 }
 </style>
