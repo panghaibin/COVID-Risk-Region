@@ -12,9 +12,12 @@
       </span>
     </p>
     <el-dialog v-model="info.visible" title="历史数据" :fullscreen="true">
-      <el-table :data="info.table">
-        <el-table-column v-if="info.ok" property="update_time" label="时间"/>
-        <el-table-column v-else label="加载中……"/>
+      <el-table :data="info.table" empty-text="数据加载中……">
+        <el-table-column label="时间">
+          <template #default="scope">
+            <router-link :to="scope.row.file_name">{{ scope.row.update_time }}</router-link>
+          </template>
+        </el-table-column>
       </el-table>
       <template #footer>
         <div class="dialog-footer">
@@ -533,6 +536,7 @@ export default {
               })
           update_time = update_time.replace(/\//g, "-").replace(":00:00", "时")
           item["update_time"] = update_time
+          item["file_name"] = item["file_name"].replace(".json", "")
           table.push(item)
         }
         that.info.table = table
