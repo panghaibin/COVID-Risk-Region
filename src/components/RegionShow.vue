@@ -371,7 +371,7 @@ export default {
                 hour: '2-digit',
               })
           day = day.replace(/\//g, "-")
-          update_time = update_time.replace(/\//g, "-").replace(":00:00", "时")
+          update_time = update_time.replace(/\//g, "-")
           let file = item["file_name"].replace(".json", "")
           if (!table.length || table[table.length - 1]['update_time'] !== day) {
             table.push({
