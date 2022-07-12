@@ -108,6 +108,12 @@ header a {
   text-align: center;
 }
 
+.link {
+  color: var(--el-color-info-dark-2);
+  vertical-align: baseline;
+  font-size: var(--el-font-size-small);
+}
+
 @media screen and (max-width: 768px) {
   .el-scrollbar__bar {
     display: none;

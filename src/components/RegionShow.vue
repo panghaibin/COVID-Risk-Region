@@ -40,8 +40,59 @@
         <p>加载历史记录失败！请刷新重试</p>
         <p>{{ info.err_msg }}</p>
       </div>
+      <el-dialog
+          v-model="info.download_visible"
+          width="300px"
+          top="25vh"
+          title="下载全部数据"
+          append-to-body
+      >
+        <div style="text-align: center">
+          <el-button v-if="!info.err" @click="download_data(0)" style="width: 10em">
+            <el-icon>
+              <Download/>
+            </el-icon>
+            GitHub 源
+          </el-button>
+          <br>
+          <br>
+          <el-button v-if="!info.err" @click="download_data(1)" style="width: 10em">
+            <el-icon>
+              <Download/>
+            </el-icon>
+            GitHub 镜像源
+          </el-button>
+          <br>
+          <br>
+          <span class="link">数据来自</span>
+          <el-link class="link" href="http://bmfw.www.gov.cn/yqfxdjcx/risk.html" target="_blank">
+            <el-icon>
+              <Link/>
+            </el-icon>
+            国家卫健委
+          </el-link>
+          <br>
+          <el-link class="link" href="https://github.com/panghaibin/COVID-Risk-Region" target="_blank">
+            <el-icon>
+              <Link/>
+            </el-icon>
+            前端项目 GitHub
+          </el-link>
+          <br>
+          <el-link class="link" href="https://github.com/panghaibin/RiskLevelAPI" target="_blank">
+            <el-icon>
+              <Link/>
+            </el-icon>
+            Api项目 GitHub
+          </el-link>
+          <br>
+        </div>
+      </el-dialog>
       <template #footer>
-        <el-button @click="info.visible = false">关闭</el-button>
+        <el-button v-if="!info.err" @click="info.download_visible = true" style="margin-right: 100px;">
+          下载全部
+        </el-button>
+        <el-button @click="info.visible = false" type="primary">关闭</el-button>
       </template>
     </el-dialog>
     <el-input
@@ -155,6 +206,7 @@ export default {
       info: {
         raw: null,
         visible: false,
+        download_visible: false,
         ok: false,
         err: false,
         err_msg: "",
@@ -650,6 +702,13 @@ export default {
         this.$router.push({
           path: "./" + row.file_name,
         })
+      }
+    },
+    download_data(target) {
+      if (target === 0) {
+        window.open('https://github.com/panghaibin/RiskLevelAPI/archive/refs/heads/api.zip');
+      } else if (target === 1) {
+        window.open('https://gh-proxy.caduo.ml/https://github.com/panghaibin/RiskLevelAPI/archive/refs/heads/api.zip');
       }
     },
   },

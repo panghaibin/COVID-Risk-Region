@@ -22,12 +22,6 @@ export default {
   padding-bottom: 10px;
 }
 
-.link {
-  color: var(--el-color-info-dark-2);
-  vertical-align: baseline;
-  font-size: var(--el-font-size-small);
-}
-
 .link:hover {
   color: var(--el-link-hover-text-color);
 }
