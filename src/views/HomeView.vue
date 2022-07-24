@@ -61,7 +61,7 @@ export default {
   },
   data() {
     return {
-      title: "全国疫情中高风险地区查询",
+      title: "全国疫情中高低风险地区查询",
       info_url: url + 'info.json'
     };
   },

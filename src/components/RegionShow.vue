@@ -170,6 +170,33 @@
         empty-text="无数据"
     />
     <el-skeleton v-else :rows="6" animated/>
+    <h3 class="low-risk">
+      低风险等级地区
+      <span class="num">({{ low.count }})</span>
+      <el-button
+          v-if="low.used"
+          class="expand-all"
+          :type="dark_mode ? 'info' : 'primary'"
+          @click="low_expand"
+          :disabled="!ok"
+      >
+        {{ low.expand_all_button }}
+      </el-button>
+    </h3>
+    <el-tree
+        v-if="ok"
+        :key="low.key"
+        :data="low.tree"
+        :props="tree_props"
+        node-key="id"
+        :default-expand-all="low.expand_all"
+        :default-expanded-keys="low.default_id_list"
+        :auto-expand-parent="false"
+        ref="low_tree"
+        :filter-node-method="low_filter"
+        :empty-text="low.empty_text"
+    />
+    <el-skeleton v-else :rows="6" animated/>
   </div>
   <div v-else>
     <p>API 获取出错，请刷新重试</p>
@@ -234,6 +261,19 @@ export default {
         default_id_list: [],
         expand_all: false,
         expand_all_button: "展开",
+      },
+      low: {
+        key: 0,
+        tree: null,
+        count: '-',
+        province_id_list: [],
+        city_id_list: [],
+        county_id_list: [],
+        default_id_list: [],
+        expand_all: false,
+        expand_all_button: "展开",
+        used: true,
+        empty_text: "无数据",
       },
 
       tree_props: {
@@ -337,6 +377,7 @@ export default {
         this.raw = JSON.parse(localStorage.getItem(this.data_name));
         this.high_init();
         this.middle_init();
+        this.low_init();
         this.ok = true;
         if ((new Date().getTime() - localStorage.getItem(this.data_name_timestamp)) < 5 * 60 * 1000) {
           return
@@ -371,6 +412,7 @@ export default {
           this.raw = data
           this.high_init()
           this.middle_init()
+          this.low_init()
           this.ok = true
         }
         this.loading_icon = false;
@@ -463,6 +505,7 @@ export default {
         this.raw = data
         this.high_init()
         this.middle_init()
+        this.low_init()
         this.ok = true
         this.loading_icon = false;
       }).catch((error) => {
@@ -585,6 +628,17 @@ export default {
       this.middle.key++
       this.middle.count = this.raw.data["mcount"]
     },
+    low_init() {
+      let lowlist = this.raw.data["lowlist"];
+      if (!lowlist) {
+        this.low.used = false;
+        this.low.empty_text = "其余未列出地区为低风险地区(历史定义)";
+        return
+      }
+      this.list2tree(this.raw.data["lowlist"], this.low)
+      this.low.key++
+      this.low.count = this.raw.data["lcount"]
+    },
     high_expand() {
       this.high.expand_all = !this.high.expand_all
       if (this.high.expand_all) {
@@ -612,6 +666,20 @@ export default {
         }
       }
       this.middle.expand_all_button = this.middle.expand_all ? "收起" : "展开"
+    },
+    low_expand() {
+      this.low.expand_all = !this.low.expand_all
+      if (this.low.expand_all) {
+        let id_list = this.low.default_id_list.concat(this.low.city_id_list)
+        for (let i = 0; i < id_list.length; i++) {
+          this.$refs.low_tree.store.getNode(id_list[i]).expanded = true;
+        }
+      } else {
+        for (let i = 0; i < this.low.city_id_list.length; i++) {
+          this.$refs.low_tree.store.getNode(this.low.city_id_list[i]).expanded = false;
+        }
+      }
+      this.low.expand_all_button = this.low.expand_all ? "收起" : "展开"
     },
     high_filter(value, data) {
       if (!value) {
@@ -679,6 +747,39 @@ export default {
       }
       return false
     },
+    low_filter(value, data) {
+      if (!value) {
+        if (data.children === undefined) {
+          this.low.count++
+        }
+        return true
+      }
+      let value_list = value.split(" ")
+      for (let i = 0; i < value_list.length; i++) {
+        let value = value_list[i]
+        if (!value) {
+          continue
+        }
+        if (data.label.includes(value)) {
+          if (data.children === undefined) {
+            this.low.count++
+          }
+          return true
+        }
+        let parent_id = data.pid
+        while (parent_id !== -1) {
+          let parent_node = this.$refs.low_tree.store.getNode(parent_id).data
+          if (parent_node.label.includes(value)) {
+            if (data.children === undefined) {
+              this.low.count++
+            }
+            return true
+          }
+          parent_id = parent_node.pid
+        }
+      }
+      return false
+    },
     tag_add(item) {
       item = item.trim()
       if (item === "") {
@@ -722,6 +823,8 @@ export default {
       this.$refs.high_tree.filter(value)
       this.middle.count = 0
       this.$refs.middle_tree.filter(value)
+      this.low.count = 0
+      this.$refs.low_tree.filter(value)
     }
   }
 }
@@ -729,7 +832,7 @@ export default {
 </script>
 
 <style scoped>
-.high-risk, .middle-risk {
+.high-risk, .middle-risk, .low-risk {
   margin-top: 1.1em;
   margin-bottom: 0.2em;
   overflow-y: auto;
@@ -742,6 +845,10 @@ export default {
 
 .middle-risk .num {
   color: #fdbe34;
+}
+
+.low-risk .num {
+  color: #0f59a4;
 }
 
 .expand-all {

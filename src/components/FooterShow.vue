@@ -1,5 +1,7 @@
 <template>
   <div class="footer-section">
+    其余未列出地区为常态化防控区域
+    <br>
     数据来自<el-link class="link" href="http://bmfw.www.gov.cn/yqfxdjcx/risk.html" target="_blank">国家卫健委</el-link>
     |
     <el-link class="link" href="https://github.com/panghaibin/COVID-Risk-Region" target="_blank">GitHub</el-link>
