@@ -635,6 +635,8 @@ export default {
         this.low.empty_text = "其余未列出地区为低风险地区(历史定义)";
         return
       }
+      this.low.used = true;
+      this.low.empty_text = "无数据";
       this.list2tree(this.raw.data["lowlist"], this.low)
       this.low.key++
       this.low.count = this.raw.data["lcount"]
@@ -823,6 +825,9 @@ export default {
       this.$refs.high_tree.filter(value)
       this.middle.count = 0
       this.$refs.middle_tree.filter(value)
+      if (!this.low.used) {
+        return
+      }
       this.low.count = 0
       this.$refs.low_tree.filter(value)
     }
