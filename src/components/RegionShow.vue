@@ -893,6 +893,10 @@ export default {
   vertical-align: text-top;
 }
 
+.el-tree__empty-text {
+  width: 100%;
+}
+
 .el-tree-node__content {
   height: auto;
 }
