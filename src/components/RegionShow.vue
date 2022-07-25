@@ -1,6 +1,6 @@
 <template>
   <div v-if="!err">
-    <p>
+    <div>
       <template v-if="ok">
         <span v-if="type_latest">
           以下数据截止自 {{ raw.data.end_update_time }}
@@ -19,7 +19,7 @@
           <span class="history-text">查看历史</span>
         </el-button>
       </span>
-    </p>
+    </div>
     <el-dialog v-model="info.visible" title="历史数据" width="320px">
       <el-table
           v-if="!info.err"
@@ -95,28 +95,45 @@
         <el-button @click="info.visible = false" type="primary">关闭</el-button>
       </template>
     </el-dialog>
-    <el-input
-        :disabled="!ok"
-        ref="filter_input"
-        v-model="filter_text"
-        placeholder="请输入区域名称，可用空格分隔多个关键词"
-        clearable
-        @clear="tag_add($refs.filter_input.input.value)"
-        @change="tag_add"
+    <div
+        v-if="!type_latest"
+        :class="ok ? ['history-pre-next'] : ['history-pre-next', 'history-pre-next-disabled']"
     >
-    </el-input>
-    <div :class="ok ? ['tag-list'] : ['tag-list', 'tag-list-disabled']">
-      <el-tag
-          v-for="(item, index) in filter_history"
-          :type="dark_mode ? 'info' : ''"
-          :key="index"
-          :closable="true"
-          @close="tag_remove(index)"
-          @click="filter_text=item;tag_add(item)"
-          class="tag-item"
+      <span v-if="info.pre" class="history-icon" style="float: left">
+        <el-button type="text" @click="router_to(info.pre)">
+          <span class="history-text">&lt; 上一历史数据</span>
+        </el-button>
+      </span>
+      <span v-if="info.next" class="history-icon">
+        <el-button type="text" @click="router_to(info.next)">
+          <span class="history-text">下一历史数据 &gt;</span>
+        </el-button>
+      </span>
+    </div>
+    <div style="margin-top: 10px">
+      <el-input
+          :disabled="!ok"
+          ref="filter_input"
+          v-model="filter_text"
+          placeholder="请输入区域名称，可用空格分隔多个关键词"
+          clearable
+          @clear="tag_add($refs.filter_input.input.value)"
+          @change="tag_add"
       >
-        {{ item }}
-      </el-tag>
+      </el-input>
+      <template :class="ok ? ['tag-list'] : ['tag-list', 'tag-list-disabled']">
+        <el-tag
+            v-for="(item, index) in filter_history"
+            :type="dark_mode ? 'info' : ''"
+            :key="index"
+            :closable="true"
+            @close="tag_remove(index)"
+            @click="filter_text=item;tag_add(item)"
+            class="tag-item"
+        >
+          {{ item }}
+        </el-tag>
+      </template>
     </div>
     <h3 class="high-risk">
       高风险等级地区
@@ -238,6 +255,8 @@ export default {
         err: false,
         err_msg: "",
         table: null,
+        pre: null,
+        next: null,
       },
 
       high: {
@@ -306,6 +325,13 @@ export default {
       }
     } else {
       this.fetch_history();
+      this.fetch_data(this.info_url, null, true).then((response) => {
+        that.info.raw = response
+        const file_name = this.$route.params.fileName;
+        const pre_next = this.find_info_pre_next(file_name);
+        this.info.pre = pre_next.pre;
+        this.info.next = pre_next.next;
+      })
     }
 
     let filter_history = JSON.parse(localStorage.getItem("filter_history"));
@@ -446,6 +472,7 @@ export default {
         let id_count = 0
         for (let i = file_list.length - 1; i >= 0; i--) {
           let item = file_list[i]
+          let file = item["file_name"].replace(".json", "")
           let update_timestamp = new Date(item["update_time"] * 1000)
           let day = update_timestamp.toLocaleString('zh-CN',
               {
@@ -462,7 +489,6 @@ export default {
               })
           day = day.replace(/\//g, "-")
           update_time = update_time.replace("24", "00")
-          let file = item["file_name"].replace(".json", "")
           if (!table.length || table[table.length - 1]['update_time'] !== day) {
             table.push({
               id: id_count++,
@@ -494,10 +520,11 @@ export default {
       this.loading_icon = true;
       let url = this.data_url;
       this.fetch_data(url, null, true).then((data) => {
+        // 增加历史数据翻页后，若频繁翻页可能会让提示框显示多次，减少时间
         let msg = "历史数据加载成功"
         ElNotification.success({
           message: msg,
-          duration: 2500,
+          duration: 900,
           position: 'bottom-right',
           showClose: false,
           customClass: 'notification-item',
@@ -798,13 +825,43 @@ export default {
       this.filter_history.splice(index, 1)
       localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
     },
+    router_to(path) {
+      if (!path) {
+        return
+      }
+      this.$router.push({
+        path: "./" + path,
+      })
+    },
     info_click(row) {
       if (row.file_name === "#") {
         this.$refs.info_table.toggleRowExpansion(row)
       } else {
-        this.$router.push({
-          path: "./" + row.file_name,
-        })
+        this.router_to(row.file_name)
+      }
+    },
+    find_info_pre_next(file_name) {
+      const info_list = this.info.raw.file_list
+      let index = info_list.findIndex(item => item.file_name === file_name + ".json")
+      if (index === -1) {
+        return
+      }
+      let pre_index = index - 1
+      let next_index = index + 1
+      let pre, next;
+      if (pre_index < 0) {
+        pre = null
+      } else {
+        pre = info_list[pre_index].file_name.replace(".json", "")
+      }
+      if (next_index >= info_list.length) {
+        next = null
+      } else {
+        next = info_list[next_index].file_name.replace(".json", "")
+      }
+      return {
+        pre: pre,
+        next: next,
       }
     },
     download_data(target) {
@@ -877,6 +934,17 @@ export default {
 }
 
 .tag-list-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.history-pre-next {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  height: 1em;
+}
+
+.history-pre-next-disabled {
   opacity: 0.5;
   pointer-events: none;
 }
