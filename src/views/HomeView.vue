@@ -2,7 +2,8 @@
   <Head>
     <title>{{ title }}</title>
   </Head>
-  <el-scrollbar height="100vh">
+<!--  禁用 el scrollbar ，不然会与 router Scroll Behavior 冲突-->
+<!--  <el-scrollbar height="100vh">-->
     <div class="content-body">
       <div class="content">
         <el-container>
@@ -25,7 +26,7 @@
         </el-container>
       </div>
     </div>
-  </el-scrollbar>
+<!--  </el-scrollbar>-->
 </template>
 
 <script>

@@ -1,6 +1,6 @@
 <template>
   <div v-if="!err">
-    <div>
+    <p>
       <template v-if="ok">
         <span v-if="type_latest">
           以下数据截止自 {{ raw.data.end_update_time }}
@@ -19,7 +19,7 @@
           <span class="history-text">查看历史</span>
         </el-button>
       </span>
-    </div>
+    </p>
     <el-dialog v-model="info.visible" title="历史数据" width="320px">
       <el-table
           v-if="!info.err"
@@ -135,85 +135,112 @@
         </el-tag>
       </template>
     </div>
-    <h3 class="high-risk">
-      高风险等级地区
-      <span class="num">({{ high.count }})</span>
-      <el-button
-          class="expand-all"
-          :type="dark_mode ? 'info' : 'primary'"
-          @click="high_expand"
-          :disabled="!ok"
-      >
-        {{ high.expand_all_button }}
-      </el-button>
-    </h3>
-    <el-tree
-        v-if="ok"
-        :key="high.key"
-        :data="high.tree"
-        :props="tree_props"
-        node-key="id"
-        :default-expand-all="high.expand_all"
-        :default-expanded-keys="high.default_id_list"
-        :auto-expand-parent="false"
-        ref="high_tree"
-        :filter-node-method="high_filter"
-        empty-text="无数据"
-    />
-    <el-skeleton v-else :rows="6" animated/>
-    <h3 class="middle-risk">
-      中风险等级地区
-      <span class="num">({{ middle.count }})</span>
-      <el-button
-          class="expand-all"
-          :type="dark_mode ? 'info' : 'primary'"
-          @click="middle_expand"
-          :disabled="!ok"
-      >
-        {{ middle.expand_all_button }}
-      </el-button>
-    </h3>
-    <el-tree
-        v-if="ok"
-        :key="middle.key"
-        :data="middle.tree"
-        :props="tree_props"
-        node-key="id"
-        :default-expand-all="middle.expand_all"
-        :default-expanded-keys="middle.default_id_list"
-        :auto-expand-parent="false"
-        ref="middle_tree"
-        :filter-node-method="middle_filter"
-        empty-text="无数据"
-    />
-    <el-skeleton v-else :rows="6" animated/>
-    <h3 class="low-risk">
-      低风险等级地区
-      <span class="num">({{ low.count }})</span>
-      <el-button
-          v-if="low.used"
-          class="expand-all"
-          :type="dark_mode ? 'info' : 'primary'"
-          @click="low_expand"
-          :disabled="!ok"
-      >
-        {{ low.expand_all_button }}
-      </el-button>
-    </h3>
-    <el-tree
-        v-if="ok"
-        :key="low.key"
-        :data="low.tree"
-        :props="tree_props"
-        node-key="id"
-        :default-expand-all="low.expand_all"
-        :default-expanded-keys="low.default_id_list"
-        :auto-expand-parent="false"
-        ref="low_tree"
-        :filter-node-method="low_filter"
-        :empty-text="low.empty_text"
-    />
-    <el-skeleton v-else :rows="6" animated/>
+    <div class="risk-show">
+      <el-affix target=".risk-show">
+        <el-tabs @tab-click="handle_tabs_click" class="risk-tab-label" stretch>
+          <el-tab-pane name="#high-risk">
+            <template #label>
+              <span class="high-risk-tab-label">高风险
+                <span class="num">({{ high.count }})</span>
+              </span>
+            </template>
+          </el-tab-pane>
+          <el-tab-pane name="#middle-risk">
+            <template #label>
+              <span class="middle-risk-tab-label">中风险
+                <span class="num">({{ middle.count }})</span>
+              </span>
+            </template>
+          </el-tab-pane>
+          <el-tab-pane name="#low-risk">
+            <template #label>
+              <span class="low-risk-tab-label">低风险
+                <span class="num">({{ low.count }})</span>
+              </span>
+            </template>
+          </el-tab-pane>
+        </el-tabs>
+      </el-affix>
+      <h3 class="high-risk" id="high-risk" style="margin-top: 0">
+        高风险等级地区
+        <span class="num">({{ high.count }})</span>
+        <el-button
+            class="expand-all"
+            :type="dark_mode ? 'info' : 'primary'"
+            @click="high_expand"
+            :disabled="!ok"
+        >
+          {{ high.expand_all_button }}
+        </el-button>
+      </h3>
+      <el-tree
+          v-if="ok"
+          :key="high.key"
+          :data="high.tree"
+          :props="tree_props"
+          node-key="id"
+          :default-expand-all="high.expand_all"
+          :default-expanded-keys="high.default_id_list"
+          :auto-expand-parent="false"
+          ref="high_tree"
+          :filter-node-method="high_filter"
+          empty-text="无数据"
+      />
+      <el-skeleton v-else :rows="6" animated/>
+      <h3 class="middle-risk" id="middle-risk">
+        中风险等级地区
+        <span class="num">({{ middle.count }})</span>
+        <el-button
+            class="expand-all"
+            :type="dark_mode ? 'info' : 'primary'"
+            @click="middle_expand"
+            :disabled="!ok"
+        >
+          {{ middle.expand_all_button }}
+        </el-button>
+      </h3>
+      <el-tree
+          v-if="ok"
+          :key="middle.key"
+          :data="middle.tree"
+          :props="tree_props"
+          node-key="id"
+          :default-expand-all="middle.expand_all"
+          :default-expanded-keys="middle.default_id_list"
+          :auto-expand-parent="false"
+          ref="middle_tree"
+          :filter-node-method="middle_filter"
+          empty-text="无数据"
+      />
+      <el-skeleton v-else :rows="6" animated/>
+      <h3 class="low-risk" id="low-risk">
+        低风险等级地区
+        <span class="num">({{ low.count }})</span>
+        <el-button
+            v-if="low.used"
+            class="expand-all"
+            :type="dark_mode ? 'info' : 'primary'"
+            @click="low_expand"
+            :disabled="!ok"
+        >
+          {{ low.expand_all_button }}
+        </el-button>
+      </h3>
+      <el-tree
+          v-if="ok"
+          :key="low.key"
+          :data="low.tree"
+          :props="tree_props"
+          node-key="id"
+          :default-expand-all="low.expand_all"
+          :default-expanded-keys="low.default_id_list"
+          :auto-expand-parent="false"
+          ref="low_tree"
+          :filter-node-method="low_filter"
+          :empty-text="low.empty_text"
+      />
+      <el-skeleton v-else :rows="6" animated/>
+    </div>
   </div>
   <div v-else>
     <p>API 获取出错，请刷新重试</p>
@@ -871,6 +898,16 @@ export default {
         window.open('https://gh-proxy.caduo.ml/https://github.com/panghaibin/RiskLevelAPI/archive/refs/heads/api.zip');
       }
     },
+    scroll_to(to) {
+      this.$router.push({
+        path: "",
+        hash: to,
+        replace: true,
+      })
+    },
+    handle_tabs_click(tab) {
+      this.scroll_to(tab.props.name)
+    },
   },
   watch: {
     filter_text(value) {
@@ -901,15 +938,19 @@ export default {
   font-weight: bold;
 }
 
-.high-risk .num {
+.high-risk-tab-label, .middle-risk-tab-label, .low-risk-tab-label {
+  font-weight: bold;
+}
+
+.high-risk-tab-label .num, .high-risk .num {
   color: #f26161;
 }
 
-.middle-risk .num {
+.middle-risk-tab-label .num, .middle-risk .num {
   color: #fdbe34;
 }
 
-.low-risk .num {
+.low-risk-tab-label .num, .low-risk .num {
   color: #0f59a4;
 }
 
@@ -1001,7 +1042,30 @@ export default {
   padding: 10px;
 }
 
+.risk-tab-label {
+  background-color: #fff;
+}
+
 @media (prefers-color-scheme: dark) {
+  .el-tabs__item {
+    color: #e2e2e2;
+  }
+
+  .el-tabs__item:hover {
+    color: var(--el-color-primary);
+    cursor: pointer;
+  }
+
+  .el-tabs__item:active {
+    color: var(--el-color-primary);
+    cursor: pointer;
+  }
+
+  .risk-tab-label {
+    background-color: #121212;
+    color: #e2e2e2;
+  }
+
   .notification-item {
     background-color: #1f1f1f;
     color: #fff;
