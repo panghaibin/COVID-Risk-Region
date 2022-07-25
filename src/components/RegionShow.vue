@@ -524,7 +524,7 @@ export default {
         let msg = "历史数据加载成功"
         ElNotification.success({
           message: msg,
-          duration: 900,
+          duration: 1200,
           position: 'bottom-right',
           showClose: false,
           customClass: 'notification-item',
