@@ -303,9 +303,9 @@ export default {
 
       filter_text: "",
       filter_history: [
-        "北京",
-        "上海",
-        "江苏",
+        "北京市",
+        "上海市",
+        "江苏省",
       ],
 
       dark_mode: false,
