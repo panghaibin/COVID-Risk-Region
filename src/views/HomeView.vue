@@ -86,7 +86,7 @@ header a {
 
 .content {
   max-width: 900px;
-  min-width: 350px;
+  min-width: 355px;
   margin: 0 auto;
   display: flex;
   min-height: 100vh;
@@ -115,8 +115,8 @@ header a {
 }
 
 @media screen and (max-width: 768px) {
-  .el-scrollbar__bar {
-    display: none;
+  .el-scrollbar__bar.is-vertical {
+    width: 3px;
   }
 }
 

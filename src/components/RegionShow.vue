@@ -89,7 +89,7 @@
         </div>
       </el-dialog>
       <template #footer>
-        <el-button v-if="!info.err" @click="info.download_visible = true" style="margin-right: 100px;">
+        <el-button v-if="!info.err" @click="info.download_visible = true" style="margin-right: 115px;">
           下载全部
         </el-button>
         <el-button @click="info.visible = false" type="primary">关闭</el-button>
