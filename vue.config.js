@@ -48,6 +48,6 @@ module.exports = defineConfig({
     msTileColor: '#ffffff',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
-    assetsVersion: '1.0.7',
+    assetsVersion: '1.0.8',
   },
 })
