@@ -245,6 +245,11 @@
       />
       <el-skeleton v-else :rows="6" animated/>
     </div>
+    <el-backtop @click="back_to_top">
+      <div class="back-top">
+        <Top style="width: 1em; height: 1em; margin: 0.5em;"/>
+      </div>
+    </el-backtop>
   </div>
   <div v-else>
     <p>API 获取出错，请刷新重试</p>
@@ -912,6 +917,9 @@ export default {
     handle_tabs_click(tab) {
       this.scroll_to(tab.props.name)
     },
+    back_to_top() {
+      this.scroll_to('');
+    },
   },
   watch: {
     filter_text(value) {
@@ -989,11 +997,6 @@ export default {
   height: 1em;
 }
 
-.history-pre-next-disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
 </style>
 <style>
 * {
@@ -1050,7 +1053,24 @@ export default {
   background-color: #fff;
 }
 
+.back-top {
+  border-radius: 50%;
+  height: 100%;
+  width: 100%;
+  background-color: var(--el-bg-color-overlay);
+  box-shadow: var(--el-box-shadow-lighter);
+  text-align: center;
+  line-height: 40px;
+  color: #1989fa;
+}
+
 @media (prefers-color-scheme: dark) {
+  .back-top, .el-backtop {
+    background-color: #1f1f1f;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.04);
+    color: #e2e2e2;
+  }
+
   .el-tabs__item {
     color: #e2e2e2;
   }
