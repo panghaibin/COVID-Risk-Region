@@ -97,7 +97,7 @@
     </el-dialog>
     <div
         v-if="!type_latest"
-        :class="ok ? ['history-pre-next'] : ['history-pre-next', 'history-pre-next-disabled']"
+        :class="ok ? ['history-pre-next'] : ['history-pre-next', 'item-disabled']"
     >
       <span v-if="info.pre" class="history-icon" style="float: left">
         <el-button type="text" @click="router_to(info.pre)">
@@ -121,7 +121,7 @@
           @change="tag_add"
       >
       </el-input>
-      <template :class="ok ? ['tag-list'] : ['tag-list', 'tag-list-disabled']">
+      <template :class="ok ? ['tag-list'] : ['tag-list', 'item-disabled']">
         <el-tag
             v-for="(item, index) in filter_history"
             :type="dark_mode ? 'info' : ''"
@@ -137,7 +137,11 @@
     </div>
     <div class="risk-show">
       <el-affix target=".risk-show">
-        <el-tabs @tab-click="handle_tabs_click" class="risk-tab-label" stretch>
+        <el-tabs
+            @tab-click="handle_tabs_click"
+            :class="ok ? ['risk-tab-label'] : ['risk-tab-label', 'item-disabled']"
+            stretch
+        >
           <el-tab-pane name="#high-risk">
             <template #label>
               <span class="high-risk-tab-label">高风险
@@ -974,7 +978,7 @@ export default {
   margin-bottom: 0.5rem;
 }
 
-.tag-list-disabled {
+.item-disabled {
   opacity: 0.5;
   pointer-events: none;
 }
