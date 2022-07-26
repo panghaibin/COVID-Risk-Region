@@ -152,6 +152,7 @@
       <el-affix target=".risk-show">
         <el-tabs
             @tab-click="handle_tabs_click"
+            v-model="selected_tab"
             :class="ok ? ['risk-tab-label'] : ['risk-tab-label', 'item-disabled']"
             stretch
         >
@@ -294,6 +295,8 @@ export default {
       api_url_list: JSON.parse(localStorage.getItem("api_url_list") || "[]"),
       api_url: localStorage.getItem("api_url") || "",
       gh_proxy_list: JSON.parse(localStorage.getItem("gh_proxy_list") || "[]"),
+
+      selected_tab: '',
 
       raw: null,
       ok: false,
@@ -945,6 +948,7 @@ export default {
     },
     back_to_top() {
       this.scroll_to('');
+      this.selected_tab = ''
     },
   },
   watch: {
