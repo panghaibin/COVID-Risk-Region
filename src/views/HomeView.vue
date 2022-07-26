@@ -36,7 +36,15 @@ import { Head } from '@vueuse/head'
 import update from '@/mixins/update'
 
 const gh_api = process.env.VUE_APP_GH_API;
-const gh_proxy_list = JSON.parse(process.env.VUE_APP_GH_PROXY_LIST);
+const gh_proxy_list = (() => {
+  const gh_list = JSON.parse(process.env.VUE_APP_GH_PROXY_LIST);
+  const arr = gh_list.slice(3, gh_list.length);
+  for (let i = 1; i < arr.length; i++) {
+    const random = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[random]] = [arr[random], arr[i]];
+  }
+  return gh_list.slice(0, 3).concat(arr);
+})()
 const api_url_list = [gh_api].concat(JSON.parse(process.env.VUE_APP_API_URL_LIST)).concat(gh_proxy_list.map((item) => {
   return `${item}${gh_api}`;
 }));
