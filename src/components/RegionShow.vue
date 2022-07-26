@@ -278,6 +278,9 @@ export default {
   },
   data() {
     return {
+      api_url_list: JSON.parse(localStorage.getItem("api_url_list") || "[]"),
+      api_url: localStorage.getItem("api_url") || "",
+
       raw: null,
       ok: false,
       err: false,
@@ -353,6 +356,11 @@ export default {
       window.vue = this;
     }
 
+    if (!this.api_url) {
+      this.api_url = this.api_url_list[0];
+      localStorage.setItem("api_url", this.api_url);
+    }
+
     if (this.type_latest) {
       if (!localStorage.getItem(this.data_name_timestamp) || !localStorage.getItem(this.data_name)) {
         this.fetch_latest(false);
@@ -386,8 +394,8 @@ export default {
     callback(media);
   },
   methods: {
-    fetch_data: async function (url, use_proxy = null, force_local = false, force_fetch = false) {
-      let name = url.split("/").pop().split(".").shift();
+    fetch_data: async function (url, api_index = null, force_local = false, force_fetch = false, loop_times = 0) {
+      let name = url.split(".").shift();
       let name_timestamp = name + "_timestamp";
       let name_local = JSON.parse(localStorage.getItem(name));
       if (force_local && !!name_local) {
@@ -397,18 +405,17 @@ export default {
         return name_local;
       }
 
-      if (use_proxy === null) {
-        use_proxy = localStorage.getItem("use_proxy") === "true";
+      let api_url = this.api_url;
+      if (api_index !== null) {
+        if (api_index < 0 || api_index >= this.api_url_list.length) {
+          api_index = 0;
+        }
+        api_url = this.api_url_list[api_index];
+        localStorage.setItem("api_url", api_url);
       }
-      let new_url
-      let timeout_time
-      let proxy_url
-      // disabled proxy temporarily due to the fxxking gfw
-      // process.env.NODE_ENV === 'development' ? proxy_url = "" : proxy_url = "https://gh.hbtech.workers.dev/"
-      proxy_url = ""
-      use_proxy ? new_url = proxy_url + url : new_url = url;
-      use_proxy ? timeout_time = 5000 : timeout_time = 2000;
+      let new_url = api_url + url
 
+      let timeout_time = 3000;
       let CancelToken = axios.CancelToken;
       const source = CancelToken.source();
       const timeout = setTimeout(() => {
@@ -422,13 +429,17 @@ export default {
         let raw = res.data;
         localStorage.setItem(name, JSON.stringify(raw));
         localStorage.setItem(name_timestamp, new Date().getTime().toString());
-        localStorage.setItem("use_proxy", use_proxy.toString());
         return Promise.resolve(raw);
       } catch (error) {
         clearTimeout(timeout);
-        console.log(error)
-        if (!use_proxy) {
-          return that.fetch_data(url, true)
+        console.log(new_url, error)
+        if (api_index === null) {
+          api_index = that.api_url_list.indexOf(api_url);
+        }
+        api_index++;
+        loop_times++;
+        if (loop_times < that.api_url_list.length) {
+          return that.fetch_data(url, api_index, force_local, force_fetch, loop_times);
         } else {
           return Promise.reject(error);
         }

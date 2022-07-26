@@ -35,10 +35,8 @@ import FooterShow from "@/components/FooterShow";
 import { Head } from '@vueuse/head'
 import update from '@/mixins/update'
 
-let url = process.env.NODE_ENV === 'development'
-    // ? 'https://covid-api.caduo.ml/'
-    ? 'http://localhost/ccr-api/'
-    : 'https://covid-api.caduo.ml/';
+const api_url_list = JSON.parse(process.env.VUE_APP_API_URL_LIST);
+localStorage.setItem('api_url_list', JSON.stringify(api_url_list));
 
 export default {
   name: "HomeView",
@@ -51,9 +49,9 @@ export default {
     api_url() {
       let file_name = this.$route.params.fileName;
       if (file_name) {
-        return url + file_name + '.json';
+        return file_name + '.json';
       } else {
-        return url + 'latest.json';
+        return 'latest.json';
       }
     },
     type_latest() {
@@ -63,7 +61,7 @@ export default {
   data() {
     return {
       title: "全国疫情高中低风险地区查询",
-      info_url: url + 'info.json'
+      info_url: 'info.json'
     };
   },
   mixins: [update],
