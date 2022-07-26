@@ -35,8 +35,13 @@ import FooterShow from "@/components/FooterShow";
 import { Head } from '@vueuse/head'
 import update from '@/mixins/update'
 
-const api_url_list = JSON.parse(process.env.VUE_APP_API_URL_LIST);
+const gh_api = process.env.VUE_APP_GH_API;
+const gh_proxy_list = JSON.parse(process.env.VUE_APP_GH_PROXY_LIST);
+const api_url_list = [gh_api].concat(JSON.parse(process.env.VUE_APP_API_URL_LIST)).concat(gh_proxy_list.map((item) => {
+  return `${item}${gh_api}`;
+}));
 localStorage.setItem('api_url_list', JSON.stringify(api_url_list));
+localStorage.setItem('gh_proxy_list', JSON.stringify(gh_proxy_list));
 
 export default {
   name: "HomeView",
