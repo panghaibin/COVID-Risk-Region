@@ -1,6 +1,6 @@
 <template>
   <div v-if="!err">
-    <p>
+    <p style="margin: 10px auto">
       <template v-if="ok">
         <span v-if="type_latest">
           以下数据截止自 {{ raw.data.end_update_time }}
@@ -110,7 +110,7 @@
         </el-button>
       </span>
     </div>
-    <div style="margin-top: 10px">
+    <div style="margin-top: 15px">
       <el-input
           :disabled="!ok"
           ref="filter_input"
@@ -982,7 +982,7 @@ export default {
 
 .tag-list {
   display: inline-block;
-  margin-top: 1rem;
+  margin-top: 0.7rem;
   margin-bottom: 0.5rem;
 }
 
