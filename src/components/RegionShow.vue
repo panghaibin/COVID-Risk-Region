@@ -14,10 +14,10 @@
       </template>
       <span v-show="loading_icon"><el-icon class="is-loading"><loading/></el-icon></span>
       <span v-if="ok && !loading_icon" class="history-icon">
-        <el-button type="text" @click="fetch_info">
+        <el-link :underline="false" type="primary" @click="fetch_info">
           <el-icon><clock/></el-icon>
           <span class="history-text">查看历史</span>
-        </el-button>
+        </el-link>
       </span>
     </p>
     <el-dialog v-model="info.visible" title="历史数据" width="320px">
@@ -48,21 +48,34 @@
           append-to-body
       >
         <div style="text-align: center">
-          <el-button v-if="!info.err" @click="download_data(0)" style="width: 10em">
+          <el-button
+              type="primary"
+              @click="download_data(-1)"
+              style="width: 10em"
+              :plain="dark_mode"
+          >
             <el-icon>
               <Download/>
             </el-icon>
             GitHub 源
           </el-button>
-          <br>
-          <br>
-          <el-button v-if="!info.err" @click="download_data(1)" style="width: 10em">
-            <el-icon>
-              <Download/>
-            </el-icon>
-            GitHub 镜像源
-          </el-button>
-          <br>
+          <br><br>
+          <template v-for="(item, index) in gh_proxy_list" :key="index">
+<!--            前端展示3个就够了吧-->
+            <el-link
+                v-if="index < 3"
+                type="default"
+                :underline="false"
+                @click="download_data(index)"
+                class="proxy-download-link"
+            >
+              <el-icon>
+                <Download/>
+              </el-icon>
+              镜像源 {{ index + 1 }}
+            </el-link>
+            <br v-if="(index + 1) % 3 === 0 && index < 3">
+          </template>
           <br>
           <span class="link">数据来自</span>
           <el-link class="link" href="http://bmfw.www.gov.cn/yqfxdjcx/risk.html" target="_blank">
@@ -100,14 +113,14 @@
         :class="ok ? ['history-pre-next'] : ['history-pre-next', 'item-disabled']"
     >
       <span v-if="info.pre" class="history-icon" style="float: left">
-        <el-button type="text" @click="router_to(info.pre)">
+        <el-link :underline="false" type="primary" @click="router_to(info.pre)">
           <span class="history-text">&lt; 上一历史数据</span>
-        </el-button>
+        </el-link>
       </span>
       <span v-if="info.next" class="history-icon">
-        <el-button type="text" @click="router_to(info.next)">
+        <el-link :underline="false" type="primary" @click="router_to(info.next)">
           <span class="history-text">下一历史数据 &gt;</span>
-        </el-button>
+        </el-link>
       </span>
     </div>
     <div style="margin-top: 15px">
@@ -280,6 +293,7 @@ export default {
     return {
       api_url_list: JSON.parse(localStorage.getItem("api_url_list") || "[]"),
       api_url: localStorage.getItem("api_url") || "",
+      gh_proxy_list: JSON.parse(localStorage.getItem("gh_proxy_list") || "[]"),
 
       raw: null,
       ok: false,
@@ -912,10 +926,11 @@ export default {
       }
     },
     download_data(target) {
-      if (target === 0) {
-        window.open('https://github.com/panghaibin/RiskLevelAPI/archive/refs/heads/api.zip');
-      } else if (target === 1) {
-        window.open('https://gh-proxy.caduo.ml/https://github.com/panghaibin/RiskLevelAPI/archive/refs/heads/api.zip');
+      const down_url = 'https://github.com/panghaibin/RiskLevelAPI/archive/refs/heads/api.zip'
+      if (target === -1) {
+        window.open(down_url);
+      } else if (target >= 0 && target < this.gh_proxy_list.length) {
+        window.open(this.gh_proxy_list[target] + down_url);
       }
     },
     scroll_to(to) {
@@ -1075,10 +1090,19 @@ export default {
   color: #1989fa;
 }
 
+.proxy-download-link {
+  height: 2em;
+  padding: 1px 7px;
+}
+
 @media (prefers-color-scheme: dark) {
   .back-top, .el-backtop {
     background-color: #1f1f1f;
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.04);
+    color: #e2e2e2;
+  }
+
+  .proxy-download-link {
     color: #e2e2e2;
   }
 
