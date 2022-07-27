@@ -61,7 +61,7 @@
           </el-button>
           <br><br>
           <template v-for="(item, index) in gh_proxy_list" :key="index">
-<!--            前端展示3个就够了吧-->
+            <!--            前端展示3个就够了吧-->
             <el-link
                 v-if="index < 3"
                 type="default"
@@ -179,85 +179,91 @@
           </el-tab-pane>
         </el-tabs>
       </el-affix>
-      <h3 class="high-risk" id="high-risk" style="margin-top: 0">
-        高风险等级地区
-        <span class="num">({{ high.count }})</span>
-        <el-button
-            class="expand-all"
-            :type="dark_mode ? 'info' : 'primary'"
-            @click="high_expand"
-            :disabled="!ok"
-        >
-          {{ high.expand_all_button }}
-        </el-button>
-      </h3>
-      <el-tree
-          v-if="ok"
-          :key="high.key"
-          :data="high.tree"
-          :props="tree_props"
-          node-key="id"
-          :default-expand-all="high.expand_all"
-          :default-expanded-keys="high.default_id_list"
-          :auto-expand-parent="false"
-          ref="high_tree"
-          :filter-node-method="high_filter"
-          empty-text="无数据"
-      />
-      <el-skeleton v-else :rows="6" animated/>
-      <h3 class="middle-risk" id="middle-risk">
-        中风险等级地区
-        <span class="num">({{ middle.count }})</span>
-        <el-button
-            class="expand-all"
-            :type="dark_mode ? 'info' : 'primary'"
-            @click="middle_expand"
-            :disabled="!ok"
-        >
-          {{ middle.expand_all_button }}
-        </el-button>
-      </h3>
-      <el-tree
-          v-if="ok"
-          :key="middle.key"
-          :data="middle.tree"
-          :props="tree_props"
-          node-key="id"
-          :default-expand-all="middle.expand_all"
-          :default-expanded-keys="middle.default_id_list"
-          :auto-expand-parent="false"
-          ref="middle_tree"
-          :filter-node-method="middle_filter"
-          empty-text="无数据"
-      />
-      <el-skeleton v-else :rows="6" animated/>
-      <h3 class="low-risk" id="low-risk">
-        低风险等级地区
-        <span class="num">({{ low.count }})</span>
-        <el-button
-            v-if="low.used"
-            class="expand-all"
-            :type="dark_mode ? 'info' : 'primary'"
-            @click="low_expand"
-            :disabled="!ok"
-        >
-          {{ low.expand_all_button }}
-        </el-button>
-      </h3>
-      <el-tree
-          v-if="ok"
-          :key="low.key"
-          :data="low.tree"
-          :props="tree_props"
-          node-key="id"
-          :default-expand-all="low.expand_all"
-          :default-expanded-keys="low.default_id_list"
-          :auto-expand-parent="false"
-          ref="low_tree"
-          :filter-node-method="low_filter"
-          :empty-text="low.empty_text"
-      />
-      <el-skeleton v-else :rows="6" animated/>
+      <div id="high-risk">
+        <h3 class="high-risk" style="margin-top: 0">
+          高风险等级地区
+          <span class="num">({{ high.count }})</span>
+          <el-button
+              class="expand-all"
+              :type="dark_mode ? 'info' : 'primary'"
+              @click="high_expand"
+              :disabled="!ok"
+          >
+            {{ high.expand_all_button }}
+          </el-button>
+        </h3>
+        <el-tree
+            v-if="ok"
+            :key="high.key"
+            :data="high.tree"
+            :props="tree_props"
+            node-key="id"
+            :default-expand-all="high.expand_all"
+            :default-expanded-keys="high.default_id_list"
+            :auto-expand-parent="false"
+            ref="high_tree"
+            :filter-node-method="high_filter"
+            empty-text="无数据"
+        />
+        <el-skeleton v-else :rows="2" animated/>
+      </div>
+      <div id="middle-risk">
+        <h3 class="middle-risk">
+          中风险等级地区
+          <span class="num">({{ middle.count }})</span>
+          <el-button
+              class="expand-all"
+              :type="dark_mode ? 'info' : 'primary'"
+              @click="middle_expand"
+              :disabled="!ok"
+          >
+            {{ middle.expand_all_button }}
+          </el-button>
+        </h3>
+        <el-tree
+            v-if="ok"
+            :key="middle.key"
+            :data="middle.tree"
+            :props="tree_props"
+            node-key="id"
+            :default-expand-all="middle.expand_all"
+            :default-expanded-keys="middle.default_id_list"
+            :auto-expand-parent="false"
+            ref="middle_tree"
+            :filter-node-method="middle_filter"
+            empty-text="无数据"
+        />
+        <el-skeleton v-else :rows="2" animated/>
+      </div>
+      <div id="low-risk">
+        <h3 class="low-risk">
+          低风险等级地区
+          <span class="num">({{ low.count }})</span>
+          <el-button
+              v-if="low.used"
+              class="expand-all"
+              :type="dark_mode ? 'info' : 'primary'"
+              @click="low_expand"
+              :disabled="!ok"
+          >
+            {{ low.expand_all_button }}
+          </el-button>
+        </h3>
+        <el-tree
+            v-if="ok"
+            :key="low.key"
+            :data="low.tree"
+            :props="tree_props"
+            node-key="id"
+            :default-expand-all="low.expand_all"
+            :default-expanded-keys="low.default_id_list"
+            :auto-expand-parent="false"
+            ref="low_tree"
+            :filter-node-method="low_filter"
+            :empty-text="low.empty_text"
+        />
+        <el-skeleton v-else :rows="2" animated/>
+      </div>
     </div>
     <el-backtop @click="back_to_top">
       <div class="back-top">
@@ -274,6 +280,7 @@
 <script>
 import axios from "axios"
 import { ElNotification } from 'element-plus'
+import debounce from 'lodash.debounce'
 
 export default {
   name: "RegionShow",
@@ -297,6 +304,9 @@ export default {
       gh_proxy_list: JSON.parse(localStorage.getItem("gh_proxy_list") || "[]"),
 
       selected_tab: '',
+      is_scrolling: false,
+      section_observer: null,
+      section_selector: ["#high-risk", "#middle-risk", "#low-risk"],
 
       raw: null,
       ok: false,
@@ -409,6 +419,21 @@ export default {
     };
     media.addEventListener('change', callback);
     callback(media);
+
+    this.observe_sections();
+
+    if (this.$route.hash && this.section_selector.indexOf(this.$route.hash) !== -1) {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 100);
+      let interval = setInterval(() => {
+        if (!this.loading_icon) {
+          this.scroll_to(this.$route.hash);
+          this.selected_tab = `#${this.$route.hash}`;
+          clearInterval(interval);
+        }
+      }, 100);
+    }
   },
   methods: {
     fetch_data: async function (url, api_index = null, force_local = false, force_fetch = false, loop_times = 0) {
@@ -936,11 +961,27 @@ export default {
         window.open(this.gh_proxy_list[target] + down_url);
       }
     },
-    scroll_to(to) {
+    scroll_to(hash) {
       this.$router.push({
         path: "",
-        hash: to,
+        hash: hash,
         replace: true,
+      })
+      const offset = (!hash) ? 0 : document.querySelectorAll(hash)[0].offsetTop - 55;
+      this.is_scrolling = true
+      const fixedOffset = offset.toFixed();
+      const onScroll = () => {
+        if (window.pageYOffset.toFixed() === fixedOffset) {
+          window.removeEventListener('scroll', onScroll)
+          this.is_scrolling = false
+        }
+      }
+      window.addEventListener('scroll', onScroll)
+      onScroll()
+      window.scrollTo({
+        left: 0,
+        top: offset,
+        behavior: 'smooth'
       })
     },
     handle_tabs_click(tab) {
@@ -949,6 +990,40 @@ export default {
     back_to_top() {
       this.scroll_to('');
       this.selected_tab = ''
+    },
+    observe_sections() {
+      try {
+        this.section_observer.disconnect()
+      } catch (error) {
+        console.log(error)
+      }
+
+      const options = {
+        rootMargin: '-15% 0px -85%',
+        threshold: 0,
+      }
+      this.section_observer = new IntersectionObserver(debounce((entries) => {
+        this.section_observer_handler(entries)
+      }, 100), options)
+
+      const sections = document.querySelectorAll(this.section_selector)
+      sections.forEach(section => {
+        this.section_observer.observe(section)
+      })
+    },
+    section_observer_handler(entries) {
+      for (const entry of entries) {
+        if (entry.isIntersecting && !this.is_scrolling) {
+          const section_id = entry.target.id
+          const hash = (section_id === '') ? '' : '#' + section_id
+          this.selected_tab = hash
+          this.$router.push({
+            path: "",
+            hash: hash,
+            replace: true,
+          })
+        }
+      }
     },
   },
   watch: {
@@ -966,8 +1041,15 @@ export default {
       }
       this.low.count = 0
       this.$refs.low_tree.filter(value)
-    }
-  }
+    },
+    is_scrolling(value) {
+      if (value) {
+        setTimeout(() => {
+          this.is_scrolling = false
+        }, 1000)
+      }
+    },
+  },
 }
 
 </script>

@@ -13,6 +13,7 @@
     "axios": "^0.26.1",
     "core-js": "^3.8.3",
     "element-plus": "^2.1.10",
+    "lodash": "^4.17.21",
     "register-service-worker": "^1.7.2",
     "unplugin-auto-import": "^0.7.1",
     "unplugin-element-plus": "^0.4.0",

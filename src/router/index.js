@@ -13,14 +13,15 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    if (to.hash) {
-      return {
-        el: to.hash,
-        behavior: 'smooth',
-        top: 55,
-      }
-    }
-    return savedPosition || { top: 0, behavior: 'smooth' }
+    // if (to.hash) {
+    //   return {
+    //     el: to.hash,
+    //     behavior: 'smooth',
+    //     top: 55,
+    //   }
+    // }
+    return savedPosition
+    // return savedPosition || { top: 0, behavior: 'smooth' }
   }
 })
 
