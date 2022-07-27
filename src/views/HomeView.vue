@@ -77,6 +77,11 @@ export default {
       info_url: 'info.json'
     };
   },
+  watch: {
+    api_url() {
+      window.scroll({ top: 0, behavior: 'smooth' });
+    }
+  },
   mixins: [update],
 
 }
