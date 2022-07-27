@@ -123,12 +123,12 @@
         </el-link>
       </span>
     </div>
-    <div style="margin-top: 15px">
+    <div class="filter-tree">
       <el-input
           :disabled="!ok"
           ref="filter_input"
           v-model="filter_text"
-          placeholder="请输入区域名称，可用空格分隔多个关键词"
+          placeholder="请输入区域名称，多个关键词空格分隔"
           clearable
           @clear="tag_add($refs.filter_input.input.value)"
           @change="tag_add"
@@ -306,7 +306,7 @@ export default {
       selected_tab: '',
       is_scrolling: false,
       section_observer: null,
-      section_selector: ["#high-risk", "#middle-risk", "#low-risk"],
+      section_selector: ["#high-risk", "#middle-risk", "#low-risk", '.filter-tree', '.header'],
 
       raw: null,
       ok: false,
@@ -1004,7 +1004,7 @@ export default {
       }
       this.section_observer = new IntersectionObserver(debounce((entries) => {
         this.section_observer_handler(entries)
-      }, 100), options)
+      }, 10), options)
 
       const sections = document.querySelectorAll(this.section_selector)
       sections.forEach(section => {
@@ -1055,6 +1055,10 @@ export default {
 </script>
 
 <style scoped>
+.filter-tree {
+  margin-top: 15px;
+}
+
 .high-risk, .middle-risk, .low-risk {
   margin-top: 1.1em;
   margin-bottom: 0.2em;
