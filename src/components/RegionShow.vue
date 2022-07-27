@@ -475,16 +475,17 @@ export default {
       } catch (error) {
         clearTimeout(timeout);
         console.log(new_url, error)
+        console.log(error.response)
         if (api_index === null) {
           api_index = that.api_url_list.indexOf(api_url);
         }
         api_index++;
         loop_times++;
-        if (loop_times < that.api_url_list.length) {
-          return that.fetch_data(url, api_index, force_local, force_fetch, loop_times);
-        } else {
+        const max_loop_times = (that.api_url_list.length < 10) ? that.api_url_list.length : 10;
+        if ((error.response && error.response.status === 404 && loop_times > 5) || loop_times > max_loop_times) {
           return Promise.reject(error);
         }
+        return that.fetch_data(url, api_index, force_local, force_fetch, loop_times);
       }
     },
     fetch_latest(check_local = false) {
