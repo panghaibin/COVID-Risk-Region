@@ -1121,6 +1121,10 @@ export default {
   'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
 }
 
+#low-risk .el-tree {
+  min-height: 75vh;
+}
+
 .el-icon.is-loading {
   animation: rotating 2s linear infinite;
   vertical-align: text-top;
