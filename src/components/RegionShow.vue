@@ -1035,13 +1035,27 @@ export default {
       }
       this.high.count = 0
       this.$refs.high_tree.filter(value)
+      if (value) {
+        this.high.expand_all = true
+        this.high.expand_all_button = '收起'
+      }
+
       this.middle.count = 0
       this.$refs.middle_tree.filter(value)
+      if (value) {
+        this.middle.expand_all = true
+        this.middle.expand_all_button = '收起'
+      }
+
       if (!this.low.used) {
         return
       }
       this.low.count = 0
       this.$refs.low_tree.filter(value)
+      if (value) {
+        this.low.expand_all = true
+        this.low.expand_all_button = '收起'
+      }
     },
     is_scrolling(value) {
       if (value) {
