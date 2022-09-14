@@ -436,7 +436,7 @@ export default {
     }
   },
   methods: {
-    fetch_data: async function (url, api_index = null, force_local = false, force_fetch = false, loop_times = 0) {
+    async fetch_data(url, api_index = null, force_local = false, force_fetch = false, loop_times = 0) {
       let name = url.split(".").shift();
       let name_timestamp = name + "_timestamp";
       let name_local = JSON.parse(localStorage.getItem(name));
@@ -469,8 +469,22 @@ export default {
         let res = await axios.get(new_url, { cancelToken: source.token })
         clearTimeout(timeout);
         let raw = res.data;
-        localStorage.setItem(name, JSON.stringify(raw));
-        localStorage.setItem(name_timestamp, new Date().getTime().toString());
+        try {
+          localStorage.setItem(name, JSON.stringify(raw));
+          localStorage.setItem(name_timestamp, new Date().getTime().toString());
+        } catch (e) {
+          console.log(e);
+          let to_remove = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            if (key.indexOf("api") === -1 && key.indexOf("latest") === -1 && key.indexOf("info") === -1) {
+              to_remove.push(key);
+            }
+          }
+          to_remove.forEach((key) => {
+            localStorage.removeItem(key);
+          });
+        }
         return Promise.resolve(raw);
       } catch (error) {
         clearTimeout(timeout);
@@ -995,9 +1009,8 @@ export default {
     observe_sections() {
       try {
         this.section_observer.disconnect()
-      } catch (error) {
-        console.log(error)
-      }
+        // eslint-disable-next-line no-empty
+      } catch (e) {}
 
       const options = {
         rootMargin: '-15% 0px -85%',
