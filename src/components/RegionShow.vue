@@ -281,6 +281,7 @@
 import axios from "axios"
 import { ElNotification } from 'element-plus'
 import debounce from 'lodash.debounce'
+import localforage from 'localforage'
 
 export default {
   name: "RegionShow",
@@ -378,10 +379,11 @@ export default {
       loading_icon: false,
     }
   },
-  mounted() {
+  async mounted() {
     if (process.env.NODE_ENV === 'development') {
       window.vue = this;
     }
+    let that = this;
 
     if (!this.api_url) {
       this.api_url = this.api_url_list[0];
@@ -389,10 +391,10 @@ export default {
     }
 
     if (this.type_latest) {
-      if (!localStorage.getItem(this.data_name_timestamp) || !localStorage.getItem(this.data_name)) {
-        this.fetch_latest(false);
+      if (!await localforage.getItem(this.data_name_timestamp) || !await localforage.getItem(this.data_name)) {
+        await this.fetch_latest(false);
       } else {
-        this.fetch_latest(true);
+        await this.fetch_latest(true);
       }
     } else {
       this.fetch_history();
@@ -413,7 +415,6 @@ export default {
     }
 
     let media = window.matchMedia('(prefers-color-scheme: dark)');
-    let that = this;
     let callback = (e) => {
       that.dark_mode = e.matches;
     };
@@ -439,11 +440,11 @@ export default {
     async fetch_data(url, api_index = null, force_local = false, force_fetch = false, loop_times = 0) {
       let name = url.split(".").shift();
       let name_timestamp = name + "_timestamp";
-      let name_local = JSON.parse(localStorage.getItem(name));
+      let name_local = await localforage.getItem(name);
       if (force_local && !!name_local) {
         return name_local;
       }
-      if (!force_fetch && new Date().getTime() - localStorage.getItem(name_timestamp) < 5 * 60 * 1000) {
+      if (!force_fetch && new Date().getTime() - await localforage.getItem(name_timestamp) < 5 * 60 * 1000) {
         return name_local;
       }
 
@@ -470,19 +471,16 @@ export default {
         clearTimeout(timeout);
         let raw = res.data;
         try {
-          localStorage.setItem(name, JSON.stringify(raw));
-          localStorage.setItem(name_timestamp, new Date().getTime().toString());
+          await localforage.setItem(name, raw);
+          await localforage.setItem(name_timestamp, new Date().getTime());
         } catch (e) {
           console.log(e);
-          let to_remove = [];
-          for (let i = 0; i < localStorage.length; i++) {
-            let key = localStorage.key(i);
-            if (key.indexOf("api") === -1 && key.indexOf("latest") === -1 && key.indexOf("info") === -1) {
-              to_remove.push(key);
-            }
-          }
-          to_remove.forEach((key) => {
-            localStorage.removeItem(key);
+          localforage.keys().then((keys) => {
+            keys.forEach((key) => {
+              if (key.indexOf("api") === -1 && key.indexOf("latest") === -1 && key.indexOf("info") === -1) {
+                localforage.removeItem(key);
+              }
+            });
           });
         }
         return Promise.resolve(raw);
@@ -502,14 +500,14 @@ export default {
         return that.fetch_data(url, api_index, force_local, force_fetch, loop_times);
       }
     },
-    fetch_latest(check_local = false) {
+    async fetch_latest(check_local = false) {
       if (check_local) {
-        this.raw = JSON.parse(localStorage.getItem(this.data_name));
+        this.raw = await localforage.getItem(this.data_name);
         this.high_init();
         this.middle_init();
         this.low_init();
         this.ok = true;
-        if ((new Date().getTime() - localStorage.getItem(this.data_name_timestamp)) < 5 * 60 * 1000) {
+        if ((new Date().getTime() - await localforage.getItem(this.data_name_timestamp)) < 5 * 60 * 1000) {
           return
         } else {
           this.loading_icon = true;
@@ -663,7 +661,7 @@ export default {
       for (let i = 0; i < list.length; i++) {
         let item = list[i]
         let province = item["province"]
-        let city = item.city
+        let city = item["city"]
         let county = item["county"]
         let communitys = item["communitys"]
         let province_item = null
