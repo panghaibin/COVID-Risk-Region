@@ -616,19 +616,19 @@ export default {
       this.loading_icon = true;
       let url = this.data_url;
       this.fetch_data(url, null, true).then(async (data) => {
-        // 增加历史数据翻页后，若频繁翻页可能会让提示框显示多次，减少时间
-        let msg = "历史数据加载成功"
-        ElNotification.success({
-          message: msg,
-          duration: 1200,
-          position: 'bottom-right',
-          showClose: false,
-          customClass: 'notification-item',
-        })
+        // 增加历史数据翻页后，若频繁翻页可能会让提示框显示多次，先移除之
+        // let msg = "历史数据加载成功"
+        // ElNotification.success({
+        //   message: msg,
+        //   duration: 1200,
+        //   position: 'bottom-right',
+        //   showClose: false,
+        //   customClass: 'notification-item',
+        // })
         this.raw = data
-        this.high_init().then()
-        this.middle_init().then()
-        this.low_init().then()
+        await this.high_init(this.data_name)
+        await this.middle_init(this.data_name)
+        await this.low_init(this.data_name)
         this.ok = true
         this.loading_icon = false;
       }).catch((error) => {
@@ -741,28 +741,60 @@ export default {
       data.county_id_list = county_id_list
       data.default_id_list = province_id_list.concat(county_id_list)
     },
-    async high_init() {
-      this.list2tree(this.raw.data["highlist"], this.high)
+    async high_init(data_name = null) {
+      if (!data_name) {
+        this.list2tree(this.raw.data["highlist"], this.high)
+        this.high.count = this.raw.data["hcount"]
+      } else {
+        const high = await localforage.getItem(`${data_name}_high`);
+        if (!high) {
+          this.list2tree(this.raw.data["highlist"], this.high)
+          this.high.count = this.raw.data["hcount"]
+          localforage.setItem(`${data_name}_high`, JSON.parse(JSON.stringify(this.high))).then()
+        } else {
+          this.high = high;
+        }
+      }
       this.high.key++
-      this.high.count = this.raw.data["hcount"]
     },
-    async middle_init() {
-      this.list2tree(this.raw.data["middlelist"], this.middle)
+    async middle_init(data_name = null) {
+      if (!data_name) {
+        this.list2tree(this.raw.data["middlelist"], this.middle)
+        this.middle.count = this.raw.data["mcount"]
+      } else {
+        const middle = await localforage.getItem(`${data_name}_middle`);
+        if (!middle) {
+          this.list2tree(this.raw.data["middlelist"], this.middle)
+          this.middle.count = this.raw.data["mcount"]
+          localforage.setItem(`${data_name}_middle`, JSON.parse(JSON.stringify(this.middle))).then()
+        } else {
+          this.middle = middle;
+        }
+      }
       this.middle.key++
-      this.middle.count = this.raw.data["mcount"]
     },
-    async low_init() {
-      let lowlist = this.raw.data["lowlist"];
-      if (!lowlist) {
+    async low_init(data_name = null) {
+      if (!this.raw.data["lowlist"]) {
         this.low.used = false;
         this.low.empty_text = "其余未列出地区为低风险地区(历史定义)";
         return
       }
+      if (!data_name) {
+        this.list2tree(this.raw.data["lowlist"], this.low)
+        this.low.count = this.raw.data["lcount"]
+      } else {
+        const low = await localforage.getItem(`${data_name}_low`);
+        if (!low) {
+          this.list2tree(this.raw.data["lowlist"], this.low)
+          this.low.count = this.raw.data["lcount"]
+          localforage.setItem(`${data_name}_low`, JSON.parse(JSON.stringify(this.low))).then()
+        } else {
+          this.low = low;
+        }
+      }
       this.low.used = true;
       this.low.empty_text = "无数据";
-      this.list2tree(this.raw.data["lowlist"], this.low)
       this.low.key++
-      this.low.count = this.raw.data["lcount"]
     },
     high_expand() {
       this.high.expand_all = !this.high.expand_all
