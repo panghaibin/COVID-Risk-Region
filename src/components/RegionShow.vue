@@ -393,7 +393,7 @@ export default {
         await this.fetch_latest(true);
       }
     } else {
-      this.fetch_history();
+      await this.fetch_history();
       this.fetch_data(this.info_url, null, true).then((response) => {
         that.info.raw = response
         const file_name = this.$route.params.fileName;
@@ -404,11 +404,8 @@ export default {
     }
 
     let media = window.matchMedia('(prefers-color-scheme: dark)');
-    let callback = (e) => {
-      that.dark_mode = e.matches;
-    };
-    media.addEventListener('change', callback);
-    callback(media);
+    media.addEventListener('change', this.handle_color_scheme_change);
+    this.handle_color_scheme_change(media);
 
     this.observe_sections();
 
@@ -492,9 +489,9 @@ export default {
     async fetch_latest(check_local = false) {
       if (check_local) {
         this.raw = await localforage.getItem(this.data_name);
-        this.high_init();
-        this.middle_init();
-        this.low_init();
+        this.high_init().then();
+        this.middle_init().then();
+        this.low_init().then();
         this.ok = true;
         if ((new Date().getTime() - await localforage.getItem(this.data_name_timestamp)) < 5 * 60 * 1000) {
           return
@@ -505,7 +502,7 @@ export default {
         this.loading_icon = true;
       }
       let url = this.data_url + "?t=" + new Date().getTime();
-      this.fetch_data(url, null, false, true).then((data) => {
+      this.fetch_data(url, null, false, true).then(async (data) => {
         let msg
         let update_required = true
         if (this.ok) {
@@ -527,9 +524,9 @@ export default {
         })
         if (update_required) {
           this.raw = data
-          this.high_init()
-          this.middle_init()
-          this.low_init()
+          this.high_init().then()
+          this.middle_init().then()
+          this.low_init().then()
           this.ok = true
         }
         this.loading_icon = false;
@@ -607,10 +604,10 @@ export default {
         console.log(error)
       })
     },
-    fetch_history() {
+    async fetch_history() {
       this.loading_icon = true;
       let url = this.data_url;
-      this.fetch_data(url, null, true).then((data) => {
+      this.fetch_data(url, null, true).then(async (data) => {
         // 增加历史数据翻页后，若频繁翻页可能会让提示框显示多次，减少时间
         let msg = "历史数据加载成功"
         ElNotification.success({
@@ -621,9 +618,9 @@ export default {
           customClass: 'notification-item',
         })
         this.raw = data
-        this.high_init()
-        this.middle_init()
-        this.low_init()
+        this.high_init().then()
+        this.middle_init().then()
+        this.low_init().then()
         this.ok = true
         this.loading_icon = false;
       }).catch((error) => {
@@ -736,17 +733,17 @@ export default {
       data.county_id_list = county_id_list
       data.default_id_list = province_id_list.concat(county_id_list)
     },
-    high_init() {
+    async high_init() {
       this.list2tree(this.raw.data["highlist"], this.high)
       this.high.key++
       this.high.count = this.raw.data["hcount"]
     },
-    middle_init() {
+    async middle_init() {
       this.list2tree(this.raw.data["middlelist"], this.middle)
       this.middle.key++
       this.middle.count = this.raw.data["mcount"]
     },
-    low_init() {
+    async low_init() {
       let lowlist = this.raw.data["lowlist"];
       if (!lowlist) {
         this.low.used = false;
@@ -993,6 +990,9 @@ export default {
       this.scroll_to('');
       this.selected_tab = ''
     },
+    handle_color_scheme_change(e) {
+      this.dark_mode = e.matches;
+    },
     observe_sections() {
       try {
         this.section_observer.disconnect()
@@ -1065,6 +1065,17 @@ export default {
         }, 1000)
       }
     },
+  },
+  beforeUnmount() {
+    window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handle_color_scheme_change);
+    this.section_observer.disconnect();
+    this.raw = null;
+    this.high = null;
+    this.middle = null;
+    this.low = null;
+    this.filter_history = null;
+    localStorage.setItem('filter_text', this.filter_text);
+    this.filter_text = null;
   },
 }
 
