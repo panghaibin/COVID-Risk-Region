@@ -421,6 +421,14 @@ export default {
         }
       }, 100);
     }
+
+    let interval = setInterval(() => {
+      if (!this.loading_icon) {
+        this.filter_text = localStorage.getItem("filter_text") || "";
+        localStorage.setItem("filter_text", '');
+        clearInterval(interval);
+      }
+    }, 100);
   },
   methods: {
     async fetch_data(url, api_index = null, force_local = false, force_fetch = false, loop_times = 0) {
