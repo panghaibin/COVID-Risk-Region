@@ -369,11 +369,7 @@ export default {
       },
 
       filter_text: "",
-      filter_history: [
-        "北京市",
-        "上海市",
-        "江苏省",
-      ],
+      filter_history: JSON.parse(localStorage.getItem("filter_history") || '["北京市", "上海市", "江苏省"]'),
 
       dark_mode: false,
       loading_icon: false,
@@ -405,13 +401,6 @@ export default {
         this.info.pre = pre_next.pre;
         this.info.next = pre_next.next;
       })
-    }
-
-    let filter_history = JSON.parse(localStorage.getItem("filter_history"));
-    if (filter_history && filter_history.length) {
-      this.filter_history = filter_history
-    } else {
-      localStorage.setItem("filter_history", JSON.stringify(this.filter_history));
     }
 
     let media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -1008,7 +997,8 @@ export default {
       try {
         this.section_observer.disconnect()
         // eslint-disable-next-line no-empty
-      } catch (e) {}
+      } catch (e) {
+      }
 
       const options = {
         rootMargin: '-15% 0px -85%',
