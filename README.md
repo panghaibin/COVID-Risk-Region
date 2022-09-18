@@ -8,12 +8,12 @@ The risk level regions on COVID-19 in China.
 
 Cloudflare Pages:
 
-- <https://covid.panghb.eu.org/>
+- [risk-region.ml](https://risk-region.ml/)
 
-- <https://covid.caduo.ml/>
+- [covid.panghb.eu.org](https://covid.panghb.eu.org/)
 
 GitHub Pages:
 
-- <https://panghb.eu.org/COVID-Risk-Region/>
+- [panghb.eu.org/COVID-Risk-Region](https://panghb.eu.org/COVID-Risk-Region/)
 
 此项目使用 Vue 3 构建，所调用的API基于 [panghaibin/RiskLevelAPI](https://github.com/panghaibin/RiskLevelAPI) 实现
