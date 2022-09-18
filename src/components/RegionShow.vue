@@ -159,21 +159,24 @@
           <el-tab-pane name="#high-risk">
             <template #label>
               <span class="high-risk-tab-label">高风险
-                <span class="num">({{ high.count }})</span>
+                <span v-if="ok" class="num">({{ high.count }})</span>
+                <span v-else class="num">(-)</span>
               </span>
             </template>
           </el-tab-pane>
           <el-tab-pane name="#middle-risk">
             <template #label>
               <span class="middle-risk-tab-label">中风险
-                <span class="num">({{ middle.count }})</span>
+                <span v-if="ok" class="num">({{ middle.count }})</span>
+                <span v-else class="num">(-)</span>
               </span>
             </template>
           </el-tab-pane>
           <el-tab-pane name="#low-risk">
             <template #label>
               <span class="low-risk-tab-label">低风险
-                <span class="num">({{ low.count }})</span>
+                <span v-if="ok" class="num">({{ low.count }})</span>
+                <span v-else class="num">(-)</span>
               </span>
             </template>
           </el-tab-pane>
@@ -182,7 +185,8 @@
       <div id="high-risk">
         <h3 class="high-risk" style="margin-top: 0">
           高风险等级地区
-          <span class="num">({{ high.count }})</span>
+          <span v-if="ok" class="num">({{ high.count }})</span>
+          <span v-else class="num">(-)</span>
           <el-button
               class="expand-all"
               :type="dark_mode ? 'info' : 'primary'"
@@ -210,7 +214,8 @@
       <div id="middle-risk">
         <h3 class="middle-risk">
           中风险等级地区
-          <span class="num">({{ middle.count }})</span>
+          <span v-if="ok" class="num">({{ middle.count }})</span>
+          <span v-else class="num">(-)</span>
           <el-button
               class="expand-all"
               :type="dark_mode ? 'info' : 'primary'"
@@ -238,7 +243,8 @@
       <div id="low-risk">
         <h3 class="low-risk">
           低风险等级地区
-          <span class="num">({{ low.count }})</span>
+          <span v-if="ok" class="num">({{ low.count }})</span>
+          <span v-else class="num">(-)</span>
           <el-button
               v-if="low.used"
               class="expand-all"
