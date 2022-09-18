@@ -741,7 +741,7 @@ export default {
       data.province_id_list = province_id_list
       data.city_id_list = city_id_list
       data.county_id_list = county_id_list
-      data.default_id_list = province_id_list.concat(county_id_list)
+      data.default_id_list = province_id_list.length < 6 ? province_id_list.concat(county_id_list) : county_id_list
     },
     async high_init(data_name = null) {
       if (!data_name) {
@@ -801,13 +801,14 @@ export default {
     high_expand() {
       this.high.expand_all = !this.high.expand_all
       if (this.high.expand_all) {
-        let id_list = this.high.default_id_list.concat(this.high.city_id_list)
+        let id_list = this.high.province_id_list.concat(this.high.city_id_list).concat(this.high.county_id_list)
         for (let i = 0; i < id_list.length; i++) {
           this.$refs.high_tree.store.getNode(id_list[i]).expanded = true;
         }
       } else {
-        for (let i = 0; i < this.high.city_id_list.length; i++) {
-          this.$refs.high_tree.store.getNode(this.high.city_id_list[i]).expanded = false;
+        let id_list = this.high.province_id_list.length < 6 ? this.high.city_id_list : this.high.province_id_list
+        for (let i = 0; i < id_list.length; i++) {
+          this.$refs.high_tree.store.getNode(id_list[i]).expanded = false;
         }
       }
       this.high.expand_all_button = this.high.expand_all ? "收起" : "展开"
@@ -815,13 +816,14 @@ export default {
     middle_expand() {
       this.middle.expand_all = !this.middle.expand_all
       if (this.middle.expand_all) {
-        let id_list = this.middle.default_id_list.concat(this.middle.city_id_list)
+        let id_list = this.middle.province_id_list.concat(this.middle.city_id_list).concat(this.middle.county_id_list)
         for (let i = 0; i < id_list.length; i++) {
           this.$refs.middle_tree.store.getNode(id_list[i]).expanded = true;
         }
       } else {
-        for (let i = 0; i < this.middle.city_id_list.length; i++) {
-          this.$refs.middle_tree.store.getNode(this.middle.city_id_list[i]).expanded = false;
+        let id_list = this.middle.province_id_list.length < 6 ? this.middle.city_id_list : this.middle.province_id_list
+        for (let i = 0; i < id_list.length; i++) {
+          this.$refs.middle_tree.store.getNode(id_list[i]).expanded = false;
         }
       }
       this.middle.expand_all_button = this.middle.expand_all ? "收起" : "展开"
@@ -829,13 +831,14 @@ export default {
     low_expand() {
       this.low.expand_all = !this.low.expand_all
       if (this.low.expand_all) {
-        let id_list = this.low.default_id_list.concat(this.low.city_id_list)
+        let id_list = this.low.province_id_list.concat(this.low.city_id_list).concat(this.low.county_id_list)
         for (let i = 0; i < id_list.length; i++) {
           this.$refs.low_tree.store.getNode(id_list[i]).expanded = true;
         }
       } else {
-        for (let i = 0; i < this.low.city_id_list.length; i++) {
-          this.$refs.low_tree.store.getNode(this.low.city_id_list[i]).expanded = false;
+        let id_list = this.low.province_id_list.length < 6 ? this.low.city_id_list : this.low.province_id_list
+        for (let i = 0; i < id_list.length; i++) {
+          this.$refs.low_tree.store.getNode(id_list[i]).expanded = false;
         }
       }
       this.low.expand_all_button = this.low.expand_all ? "收起" : "展开"
