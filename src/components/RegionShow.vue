@@ -427,14 +427,6 @@ export default {
         }
       }, 100);
     }
-
-    let interval = setInterval(() => {
-      if (!this.loading_icon) {
-        this.filter_text = localStorage.getItem("filter_text") || "";
-        localStorage.setItem("filter_text", '');
-        clearInterval(interval);
-      }
-    }, 100);
   },
   methods: {
     async fetch_data(url, api_index = null, force_local = false, force_fetch = false, loop_times = 0) {
@@ -637,6 +629,10 @@ export default {
         await this.low_init(this.data_name)
         this.ok = true
         this.loading_icon = false;
+        setTimeout(() => {
+          this.filter_text = localStorage.getItem("filter_text") || "";
+          localStorage.setItem("filter_text", '');
+        }, 0)
       }).catch((error) => {
         console.log(error)
         let msg = "历史数据加载失败"
@@ -780,7 +776,7 @@ export default {
       this.middle.key++
     },
     async low_init(data_name = null) {
-      if (!this.raw.data["lowlist"]) {
+      if (!this.raw.data["lcount"]) {
         this.low.used = false;
         this.low.empty_text = "其余未列出地区为低风险地区(历史定义)";
         return
