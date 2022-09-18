@@ -2,31 +2,31 @@
   <Head>
     <title>{{ title }}</title>
   </Head>
-<!--  禁用 el scrollbar ，不然会与 router Scroll Behavior 冲突-->
-<!--  <el-scrollbar height="100vh">-->
-    <div class="content-body">
-      <div class="content">
-        <el-container>
-          <el-header class="header">
-            <router-link to="/">
-              <h1>{{ title }}</h1>
-            </router-link>
-          </el-header>
-          <el-main>
-            <RegionShow
-                :key="api_url"
-                :data_url="api_url"
-                :info_url="info_url"
-                :type_latest="type_latest"
-            ></RegionShow>
-          </el-main>
-          <el-footer class="footer">
-            <FooterShow></FooterShow>
-          </el-footer>
-        </el-container>
-      </div>
+  <!--  禁用 el scrollbar ，不然会与 router Scroll Behavior 冲突-->
+  <!--  <el-scrollbar height="100vh">-->
+  <div class="content-body">
+    <div class="content">
+      <el-container>
+        <el-header class="header">
+          <router-link to="/">
+            <h1>{{ title }}</h1>
+          </router-link>
+        </el-header>
+        <el-main>
+          <RegionShow
+              :key="api_url"
+              :data_url="api_url"
+              :info_url="info_url"
+              :type_latest="type_latest"
+          ></RegionShow>
+        </el-main>
+        <el-footer class="footer">
+          <FooterShow></FooterShow>
+        </el-footer>
+      </el-container>
     </div>
-<!--  </el-scrollbar>-->
+  </div>
+  <!--  </el-scrollbar>-->
 </template>
 
 <script>
@@ -37,7 +37,9 @@ import update from '@/mixins/update'
 
 const gh_api = process.env.VUE_APP_GH_API;
 const gh_proxy_list = (() => {
-  const gh_list = JSON.parse(process.env.VUE_APP_GH_PROXY_LIST);
+  const gh_list = JSON.parse(process.env.VUE_APP_GH_PROXY_LIST).map((url) => {
+    return `https://${url}/`
+  });
   const arr = gh_list.slice(2, gh_list.length);
   for (let i = 1; i < arr.length; i++) {
     const random = Math.floor(Math.random() * (i + 1));
@@ -97,7 +99,7 @@ html, body {
 }
 
 header a {
-  text-decoration:none;
+  text-decoration: none;
   color: inherit;
 }
 
