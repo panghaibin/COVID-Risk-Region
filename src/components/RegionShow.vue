@@ -207,6 +207,7 @@
             :auto-expand-parent="false"
             ref="high_tree"
             :filter-node-method="high_filter"
+            :render-content="render_tree"
             empty-text="无数据"
         />
         <el-skeleton v-else :rows="2" animated/>
@@ -236,6 +237,7 @@
             :auto-expand-parent="false"
             ref="middle_tree"
             :filter-node-method="middle_filter"
+            :render-content="render_tree"
             empty-text="无数据"
         />
         <el-skeleton v-else :rows="2" animated/>
@@ -266,6 +268,7 @@
             :auto-expand-parent="false"
             ref="low_tree"
             :filter-node-method="low_filter"
+            :render-content="render_tree"
             :empty-text="low.empty_text"
         />
         <el-skeleton v-else :rows="2" animated/>
@@ -674,6 +677,7 @@ export default {
         if (province_item === null) {
           province_item = {
             id: id_count++,
+            count: 0,
             pid: -1,
             label: province,
             children: [],
@@ -692,6 +696,7 @@ export default {
         if (city_item === null) {
           city_item = {
             id: id_count++,
+            count: 0,
             pid: province_item.id,
             label: city,
             children: [],
@@ -711,6 +716,7 @@ export default {
         if (county_item === null) {
           county_item = {
             id: id_count++,
+            count: 0,
             pid: city_item.id,
             label: county,
             children: [],
@@ -729,6 +735,9 @@ export default {
         if (communitys_item === null) {
           communitys_item = []
           for (let j = 0; j < communitys.length; j++) {
+            province_item.count++;
+            city_item.count++;
+            county_item.count++;
             county_item.children.push({
               id: id_count++,
               pid: county_item.id,
@@ -797,6 +806,26 @@ export default {
       this.low.used = true;
       this.low.empty_text = "无数据";
       this.low.key++
+    },
+    render_tree(h, { node }) {
+      return h(
+          'span',
+          { class: 'el-tree-node__label' },
+          h(
+              'span',
+              null,
+              `${node.label}`
+          ),
+          h(
+              'span',
+              { style: 'font-size: 0.8rem;' },
+              (() => {
+                if (node.data.expanded) {
+                  return ` (${node.data.count})`
+                }
+              })()
+          )
+      )
     },
     high_expand() {
       this.high.expand_all = !this.high.expand_all
