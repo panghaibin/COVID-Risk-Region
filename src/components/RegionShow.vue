@@ -627,15 +627,16 @@ export default {
         //   customClass: 'notification-item',
         // })
         this.raw = data
-        await this.high_init(this.data_name)
-        await this.middle_init(this.data_name)
-        await this.low_init(this.data_name)
+        await this.high_init()
+        await this.middle_init()
+        await this.low_init()
         this.ok = true
         this.loading_icon = false;
         setTimeout(() => {
           this.filter_text = localStorage.getItem("filter_text") || "";
           localStorage.setItem("filter_text", '');
         }, 0)
+        localforage.setItem(`${this.data_name}_timestamp`, new Date().getTime()).then()
       }).catch((error) => {
         console.log(error)
         let msg = "历史数据加载失败"
@@ -762,7 +763,6 @@ export default {
           this.list2tree(this.raw.data["highlist"], this.high)
           this.high.count = this.raw.data["hcount"]
           localforage.setItem(`${data_name}_high`, JSON.parse(JSON.stringify(this.high))).then()
-          localforage.setItem(`${data_name}_timestamp`, new Date().getTime()).then()
         } else {
           this.high = high;
         }
@@ -779,7 +779,6 @@ export default {
           this.list2tree(this.raw.data["middlelist"], this.middle)
           this.middle.count = this.raw.data["mcount"]
           localforage.setItem(`${data_name}_middle`, JSON.parse(JSON.stringify(this.middle))).then()
-          localforage.setItem(`${data_name}_timestamp`, new Date().getTime()).then()
         } else {
           this.middle = middle;
         }
@@ -801,7 +800,6 @@ export default {
           this.list2tree(this.raw.data["lowlist"], this.low)
           this.low.count = this.raw.data["lcount"]
           localforage.setItem(`${data_name}_low`, JSON.parse(JSON.stringify(this.low))).then()
-          localforage.setItem(`${data_name}_timestamp`, new Date().getTime()).then()
         } else {
           this.low = low;
         }
