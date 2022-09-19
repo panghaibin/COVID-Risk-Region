@@ -741,7 +741,7 @@ export default {
       data.province_id_list = province_id_list
       data.city_id_list = city_id_list
       data.county_id_list = county_id_list
-      data.default_id_list = province_id_list.length < 6 ? province_id_list.concat(county_id_list) : county_id_list
+      data.default_id_list = city_id_list.length < 15 ? province_id_list.concat(county_id_list) : county_id_list
     },
     async high_init(data_name = null) {
       if (!data_name) {
@@ -806,7 +806,7 @@ export default {
           this.$refs.high_tree.store.getNode(id_list[i]).expanded = true;
         }
       } else {
-        let id_list = this.high.province_id_list.length < 6 ? this.high.city_id_list : this.high.province_id_list
+        let id_list = this.high.city_id_list.length < 15 ? this.high.city_id_list : this.high.province_id_list
         for (let i = 0; i < id_list.length; i++) {
           this.$refs.high_tree.store.getNode(id_list[i]).expanded = false;
         }
@@ -821,7 +821,7 @@ export default {
           this.$refs.middle_tree.store.getNode(id_list[i]).expanded = true;
         }
       } else {
-        let id_list = this.middle.province_id_list.length < 6 ? this.middle.city_id_list : this.middle.province_id_list
+        let id_list = this.middle.city_id_list.length < 15 ? this.middle.city_id_list : this.middle.province_id_list
         for (let i = 0; i < id_list.length; i++) {
           this.$refs.middle_tree.store.getNode(id_list[i]).expanded = false;
         }
@@ -836,7 +836,7 @@ export default {
           this.$refs.low_tree.store.getNode(id_list[i]).expanded = true;
         }
       } else {
-        let id_list = this.low.province_id_list.length < 6 ? this.low.city_id_list : this.low.province_id_list
+        let id_list = this.low.city_id_list.length < 15 ? this.low.city_id_list : this.low.province_id_list
         for (let i = 0; i < id_list.length; i++) {
           this.$refs.low_tree.store.getNode(id_list[i]).expanded = false;
         }
