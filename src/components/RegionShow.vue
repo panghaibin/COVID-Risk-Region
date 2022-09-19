@@ -1243,6 +1243,17 @@ export default {
 
 .el-tree-node__content {
   height: auto;
+  min-height: 26px;
+}
+
+.el-tree-node__content .el-icon {
+  color: var(--el-tree-expand-icon-color);
+  font-size: 12px;
+}
+
+.el-tree-node__expand-icon.is-leaf {
+  color: transparent;
+  cursor: default;
 }
 
 .el-tree-node {
