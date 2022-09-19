@@ -758,10 +758,11 @@ export default {
         this.high.count = this.raw.data["hcount"]
       } else {
         const high = await localforage.getItem(`${data_name}_high`);
-        if (!high) {
+        if (!high || (new Date().getTime() - await localforage.getItem(`${data_name}_timestamp`)) > 5 * 60 * 1000) {
           this.list2tree(this.raw.data["highlist"], this.high)
           this.high.count = this.raw.data["hcount"]
           localforage.setItem(`${data_name}_high`, JSON.parse(JSON.stringify(this.high))).then()
+          localforage.setItem(`${data_name}_timestamp`, new Date().getTime()).then()
         } else {
           this.high = high;
         }
@@ -774,10 +775,11 @@ export default {
         this.middle.count = this.raw.data["mcount"]
       } else {
         const middle = await localforage.getItem(`${data_name}_middle`);
-        if (!middle) {
+        if (!middle || (new Date().getTime() - await localforage.getItem(`${data_name}_timestamp`)) > 5 * 60 * 1000) {
           this.list2tree(this.raw.data["middlelist"], this.middle)
           this.middle.count = this.raw.data["mcount"]
           localforage.setItem(`${data_name}_middle`, JSON.parse(JSON.stringify(this.middle))).then()
+          localforage.setItem(`${data_name}_timestamp`, new Date().getTime()).then()
         } else {
           this.middle = middle;
         }
@@ -795,10 +797,11 @@ export default {
         this.low.count = this.raw.data["lcount"]
       } else {
         const low = await localforage.getItem(`${data_name}_low`);
-        if (!low) {
+        if (!low || (new Date().getTime() - await localforage.getItem(`${data_name}_timestamp`)) > 5 * 60 * 1000) {
           this.list2tree(this.raw.data["lowlist"], this.low)
           this.low.count = this.raw.data["lcount"]
           localforage.setItem(`${data_name}_low`, JSON.parse(JSON.stringify(this.low))).then()
+          localforage.setItem(`${data_name}_timestamp`, new Date().getTime()).then()
         } else {
           this.low = low;
         }
