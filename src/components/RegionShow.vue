@@ -815,13 +815,7 @@ export default {
           h(
               'span',
               null,
-              (() => {
-                if (node.data.expanded) {
-                  return `${node.label}`
-                } else {
-                  return `• ${node.label}`
-                }
-              })()
+              `${node.label}`
           ),
           h(
               'span',
@@ -1246,14 +1240,32 @@ export default {
   min-height: 26px;
 }
 
+.el-tree-node__label {
+  padding: 3px 0 3px 0;
+}
+
 .el-tree-node__content .el-icon {
   color: var(--el-tree-expand-icon-color);
   font-size: 12px;
 }
 
+.el-tree-node__expand-icon.is-leaf svg {
+  display: none;
+}
+
 .el-tree-node__expand-icon.is-leaf {
-  color: transparent;
   cursor: default;
+  align-self: flex-start;
+  padding: 8px 0 6px 0;
+}
+
+.el-tree-node__expand-icon.is-leaf::before {
+  font-style: normal;
+  content: '•';
+  height: 13px;
+  width: 12px;
+  transform: scale(160%);
+  transform-origin: left;
 }
 
 .el-tree-node {
