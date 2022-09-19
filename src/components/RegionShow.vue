@@ -817,11 +817,17 @@ export default {
           h(
               'span',
               null,
-              `${node.label}`
+              (() => {
+                if (node.data.expanded) {
+                  return `${node.label}`
+                } else {
+                  return `• ${node.label}`
+                }
+              })()
           ),
           h(
               'span',
-              { style: 'font-size: 0.8rem;' },
+              { style: 'font-size: 0.87rem;' },
               (() => {
                 if (node.data.expanded) {
                   return ` (${node.data.count})`
