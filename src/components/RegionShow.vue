@@ -627,9 +627,9 @@ export default {
         //   customClass: 'notification-item',
         // })
         this.raw = data
-        await this.high_init()
-        await this.middle_init()
-        await this.low_init()
+        this.high_init().then()
+        this.middle_init().then()
+        this.low_init().then()
         this.ok = true
         this.loading_icon = false;
         setTimeout(() => {
