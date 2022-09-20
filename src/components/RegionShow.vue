@@ -7,8 +7,8 @@
         </span>
         <span v-else style="user-select: none">
             历史数据 {{ raw.data.end_update_time }}
-          <el-tooltip class="box-item" effect="light" placement="right">
-            <template #content> <center>获取于 <br/> {{ history.save_time }}</center></template>
+          <el-tooltip class="box-item" :effect="dark_mode ? 'dark' : 'light'" placement="right-end">
+            <template #content> <span style="display: block;text-align: center;">获取于 <br/> {{ history.save_time }}</span></template>
             <span style="vertical-align: middle; padding-left: 3px">
               <svg width="12px" height="12px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                    class="bi bi-info-circle"><path
@@ -1312,9 +1312,8 @@ export default {
   font-size: 1em;
 }
 
-.history-icon .el-button .history-text {
-  font-size: 0.8em;
-  margin: 0;
+.history-text {
+  user-select: none;
 }
 
 .el-dialog__body {
