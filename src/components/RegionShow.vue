@@ -5,8 +5,17 @@
         <span v-if="type_latest">
           以下数据截止自 {{ raw.data.end_update_time }}
         </span>
-        <span v-else>
-          历史数据 {{ raw.data.end_update_time }}
+        <span v-else style="user-select: none">
+            历史数据 {{ raw.data.end_update_time }}
+          <el-tooltip class="box-item" effect="light" placement="right">
+            <template #content> <center>获取于 <br/> {{ history.save_time }}</center></template>
+            <span style="vertical-align: middle; padding-left: 3px">
+              <svg width="12px" height="12px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                   class="bi bi-info-circle"><path
+                  d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path
+                  d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
+            </span>
+          </el-tooltip>
         </span>
       </template>
       <template v-else>
@@ -112,13 +121,13 @@
         v-if="!type_latest"
         :class="ok ? ['history-pre-next'] : ['history-pre-next', 'item-disabled']"
     >
-      <span v-if="info.pre" class="history-icon" style="float: left">
-        <el-link :underline="false" type="primary" @click="router_to(info.pre)">
+      <span v-if="history.pre" class="history-icon" style="float: left">
+        <el-link :underline="false" type="primary" @click="router_to(history.pre)">
           <span class="history-text">&lt; 上一历史数据</span>
         </el-link>
       </span>
-      <span v-if="info.next" class="history-icon">
-        <el-link :underline="false" type="primary" @click="router_to(info.next)">
+      <span v-if="history.next" class="history-icon">
+        <el-link :underline="false" type="primary" @click="router_to(history.next)">
           <span class="history-text">下一历史数据 &gt;</span>
         </el-link>
       </span>
@@ -331,8 +340,12 @@ export default {
         err: false,
         err_msg: "",
         table: null,
+      },
+
+      history: {
         pre: null,
         next: null,
+        save_time: null,
       },
 
       high: {
@@ -406,9 +419,10 @@ export default {
       this.fetch_data(this.info_url, null, true).then((response) => {
         that.info.raw = response
         const file_name = this.$route.params.fileName;
-        const pre_next = this.find_info_pre_next(file_name);
-        this.info.pre = pre_next.pre;
-        this.info.next = pre_next.next;
+        const history_info = this.get_current_history_info(file_name);
+        this.history.pre = history_info.pre;
+        this.history.next = history_info.next;
+        this.history.save_time = history_info.save_time;
       })
     }
 
@@ -1003,28 +1017,35 @@ export default {
         this.router_to(row.file_name)
       }
     },
-    find_info_pre_next(file_name) {
-      const info_list = this.info.raw.file_list
+    get_current_history_info(file_name) {
+      const info_list = this.info.raw['file_list']
       let index = info_list.findIndex(item => item.file_name === file_name + ".json")
       if (index === -1) {
         return
       }
-      let pre_index = index - 1
-      let next_index = index + 1
-      let pre, next;
-      if (pre_index < 0) {
-        pre = null
-      } else {
-        pre = info_list[pre_index].file_name.replace(".json", "")
-      }
-      if (next_index >= info_list.length) {
-        next = null
-      } else {
-        next = info_list[next_index].file_name.replace(".json", "")
-      }
+
+      const pre_index = index - 1
+      const next_index = index + 1
+
+      const pre = pre_index < 0 ? null : info_list[pre_index]['file_name'].replace(".json", "");
+      const next = next_index >= info_list.length ? null : info_list[next_index]['file_name'].replace(".json", "")
+
+      const save_time = new Date(info_list[index]['save_time'] * 1000).toLocaleString('zh-CN',
+          {
+            timeZone: 'Asia/Shanghai',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          }).replace(/\//g, "-")
+
       return {
         pre: pre,
         next: next,
+        save_time: save_time,
       }
     },
     download_data(target) {
