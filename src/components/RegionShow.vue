@@ -279,6 +279,7 @@
             ref="low_tree"
             :filter-node-method="low_filter"
             :render-content="render_tree"
+            empty-text="无数据"
         />
         <el-skeleton v-else :rows="2" animated/>
       </div>
