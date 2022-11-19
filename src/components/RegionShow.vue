@@ -3,12 +3,14 @@
     <p style="margin: 10px auto">
       <template v-if="ok">
         <span v-if="type_latest">
-          以下数据截止自 {{ raw.data.end_update_time }}
+          以下数据截至 {{ raw.data.end_update_time }}
         </span>
         <span v-else style="user-select: none">
             历史数据 {{ raw.data.end_update_time }}
           <el-tooltip class="box-item" :effect="dark_mode ? 'dark' : 'light'" placement="right-end">
-            <template #content> <span style="display: block;text-align: center;">获取于 <br/> {{ history.save_time }}</span></template>
+            <template #content> <span style="display: block;text-align: center;">获取于 <br/> {{
+                history.save_time
+              }}</span></template>
             <span style="vertical-align: middle; padding-left: 3px">
               <svg width="12px" height="12px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                    class="bi bi-info-circle"><path
@@ -165,7 +167,7 @@
             :class="ok ? ['risk-tab-label'] : ['risk-tab-label', 'item-disabled']"
             stretch
         >
-          <el-tab-pane name="#high-risk">
+          <el-tab-pane v-if="high.display" name="#high-risk">
             <template #label>
               <span class="high-risk-tab-label">高风险
                 <span v-if="ok" class="num">({{ high.count }})</span>
@@ -173,7 +175,7 @@
               </span>
             </template>
           </el-tab-pane>
-          <el-tab-pane name="#middle-risk">
+          <el-tab-pane v-if="middle.display" name="#middle-risk">
             <template #label>
               <span class="middle-risk-tab-label">中风险
                 <span v-if="ok" class="num">({{ middle.count }})</span>
@@ -181,7 +183,7 @@
               </span>
             </template>
           </el-tab-pane>
-          <el-tab-pane name="#low-risk">
+          <el-tab-pane v-if="low.display" name="#low-risk">
             <template #label>
               <span class="low-risk-tab-label">低风险
                 <span v-if="ok" class="num">({{ low.count }})</span>
@@ -191,7 +193,7 @@
           </el-tab-pane>
         </el-tabs>
       </el-affix>
-      <div id="high-risk">
+      <div v-if="high.display" id="high-risk">
         <h3 class="high-risk" style="margin-top: 0">
           高风险等级地区
           <span v-if="ok" class="num">({{ high.count }})</span>
@@ -221,7 +223,7 @@
         />
         <el-skeleton v-else :rows="2" animated/>
       </div>
-      <div id="middle-risk">
+      <div v-if="middle.display" id="middle-risk">
         <h3 class="middle-risk">
           中风险等级地区
           <span v-if="ok" class="num">({{ middle.count }})</span>
@@ -251,13 +253,12 @@
         />
         <el-skeleton v-else :rows="2" animated/>
       </div>
-      <div id="low-risk">
+      <div v-if="low.display" id="low-risk">
         <h3 class="low-risk">
           低风险等级地区
           <span v-if="ok" class="num">({{ low.count }})</span>
           <span v-else class="num">(-)</span>
           <el-button
-              v-if="low.used"
               class="expand-all"
               :type="dark_mode ? 'info' : 'primary'"
               @click="low_expand"
@@ -278,7 +279,6 @@
             ref="low_tree"
             :filter-node-method="low_filter"
             :render-content="render_tree"
-            :empty-text="low.empty_text"
         />
         <el-skeleton v-else :rows="2" animated/>
       </div>
@@ -350,6 +350,7 @@ export default {
 
       high: {
         key: 0,
+        display: true,
         tree: null,
         count: '-',
         province_id_list: [],
@@ -361,6 +362,7 @@ export default {
       },
       middle: {
         key: 0,
+        display: false,
         tree: null,
         count: '-',
         province_id_list: [],
@@ -372,6 +374,7 @@ export default {
       },
       low: {
         key: 0,
+        display: true,
         tree: null,
         count: '-',
         province_id_list: [],
@@ -380,8 +383,6 @@ export default {
         default_id_list: [],
         expand_all: false,
         expand_all_button: "展开",
-        used: true,
-        empty_text: "无数据",
       },
 
       tree_props: {
@@ -430,7 +431,12 @@ export default {
     media.addEventListener('change', this.handle_color_scheme_change);
     this.handle_color_scheme_change(media);
 
-    this.observe_sections();
+    let observe_interval = setInterval(() => {
+      if (!this.loading_icon) {
+        this.observe_sections();
+        clearInterval(observe_interval);
+      }
+    }, 100);
 
     if (this.$route.hash && this.section_selector.indexOf(this.$route.hash) !== -1) {
       setTimeout(() => {
@@ -761,6 +767,7 @@ export default {
           }
         }
       }
+      data.display = !!tree.length;
       data.tree = tree
       data.province_id_list = province_id_list
       data.city_id_list = city_id_list
@@ -768,6 +775,10 @@ export default {
       data.default_id_list = city_id_list.length < 15 ? province_id_list.concat(county_id_list) : county_id_list
     },
     async high_init(data_name = null) {
+      if (!this.raw.data["hcount"]) {
+        this.high.display = false;
+        return
+      }
       if (!data_name) {
         this.list2tree(this.raw.data["highlist"], this.high)
         this.high.count = this.raw.data["hcount"]
@@ -784,6 +795,10 @@ export default {
       this.high.key++
     },
     async middle_init(data_name = null) {
+      if (!this.raw.data["mcount"]) {
+        this.middle.display = false;
+        return
+      }
       if (!data_name) {
         this.list2tree(this.raw.data["middlelist"], this.middle)
         this.middle.count = this.raw.data["mcount"]
@@ -801,8 +816,7 @@ export default {
     },
     async low_init(data_name = null) {
       if (!this.raw.data["lcount"]) {
-        this.low.used = false;
-        this.low.empty_text = "其余未列出地区为低风险地区(历史定义)";
+        this.low.display = false;
         return
       }
       if (!data_name) {
@@ -818,7 +832,7 @@ export default {
           this.low = low;
         }
       }
-      this.low.used = true;
+      this.low.display = true;
       this.low.empty_text = "无数据";
       this.low.key++
     },
@@ -1130,28 +1144,31 @@ export default {
       while (value.includes("  ")) {
         value = value.replace("  ", " ")
       }
-      this.high.count = 0
-      this.$refs.high_tree.filter(value)
-      if (value) {
-        this.high.expand_all = true
-        this.high.expand_all_button = '收起'
+      if (this.high.display) {
+        this.high.count = 0
+        this.$refs.high_tree.filter(value)
+        if (value) {
+          this.high.expand_all = true
+          this.high.expand_all_button = '收起'
+        }
       }
 
-      this.middle.count = 0
-      this.$refs.middle_tree.filter(value)
-      if (value) {
-        this.middle.expand_all = true
-        this.middle.expand_all_button = '收起'
+      if (this.middle.display) {
+        this.middle.count = 0
+        this.$refs.middle_tree.filter(value)
+        if (value) {
+          this.middle.expand_all = true
+          this.middle.expand_all_button = '收起'
+        }
       }
 
-      if (!this.low.used) {
-        return
-      }
-      this.low.count = 0
-      this.$refs.low_tree.filter(value)
-      if (value) {
-        this.low.expand_all = true
-        this.low.expand_all_button = '收起'
+      if (this.low.display) {
+        this.low.count = 0
+        this.$refs.low_tree.filter(value)
+        if (value) {
+          this.low.expand_all = true
+          this.low.expand_all_button = '收起'
+        }
       }
     },
     is_scrolling(value) {
