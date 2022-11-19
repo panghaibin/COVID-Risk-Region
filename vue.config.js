@@ -43,11 +43,11 @@ module.exports = defineConfig({
     ],
   },
   pwa: {
-    name: '全国疫情高中低风险地区查询',
+    name: '全国新冠疫情风险地区查询',
     themeColor: '#409EFF',
     msTileColor: '#ffffff',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
-    assetsVersion: '1.0.8',
+    assetsVersion: '1.0.9',
   },
 })

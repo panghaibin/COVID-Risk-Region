@@ -2,7 +2,7 @@
 
 The risk level regions on COVID-19 in China.
 
-新冠疫情高中低风险地区查询
+全国新冠疫情风险地区查询
 
 在线使用：
 

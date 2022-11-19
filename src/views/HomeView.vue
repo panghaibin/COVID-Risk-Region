@@ -75,7 +75,7 @@ export default {
   },
   data() {
     return {
-      title: "全国疫情高中低风险地区查询",
+      title: "全国新冠疫情风险地区查询",
       info_url: 'info.json'
     };
   },
