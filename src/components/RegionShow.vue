@@ -769,11 +769,12 @@ export default {
         }
       }
       data.display = !!tree.length;
-      data.tree = tree
-      data.province_id_list = province_id_list
-      data.city_id_list = city_id_list
-      data.county_id_list = county_id_list
-      data.default_id_list = city_id_list.length < 15 ? province_id_list.concat(county_id_list) : county_id_list
+      data.tree = tree;
+      data.province_id_list = province_id_list;
+      data.city_id_list = city_id_list;
+      data.county_id_list = county_id_list;
+      // data.default_id_list = city_id_list.length < 15 ? province_id_list.concat(county_id_list) : county_id_list;
+      data.default_id_list = city_id_list.length < 15 ? province_id_list : null;
     },
     async high_init(data_name = null) {
       if (!this.raw.data["hcount"]) {
