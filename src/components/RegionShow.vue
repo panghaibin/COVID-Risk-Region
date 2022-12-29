@@ -134,7 +134,10 @@
         </el-link>
       </span>
     </div>
-    <div class="filter-tree">
+    <div
+        v-if="high.display || middle.display || low.display"
+        class="filter-tree"
+    >
       <el-input
           :disabled="!ok"
           ref="filter_input"
@@ -160,6 +163,13 @@
       </template>
     </div>
     <div class="risk-show">
+      <div
+          v-if="!high.display && !middle.display && !low.display"
+          style="text-align: center;  color: var(--el-color-info-dark-2); font-size: var(--el-font-size-small);"
+      >
+        It's Over : )<br>
+        点击 查看历史 可浏览及下载过往数据<br>
+      </div>
       <el-affix target=".risk-show">
         <el-tabs
             @tab-click="handle_tabs_click"
